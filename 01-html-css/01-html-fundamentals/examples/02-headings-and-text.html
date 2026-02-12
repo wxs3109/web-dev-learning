@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headings and Text</title>
+</head>
+<body>
+
+    <!-- Headings: h1 through h6, representing a hierarchy of importance -->
+    <!-- A page should have exactly ONE h1 -->
+    <h1>Main Page Title (h1)</h1>
+
+    <h2>Section Heading (h2)</h2>
+    <p>Paragraphs are block-level elements. Each <code>&lt;p&gt;</code> starts on a new line with spacing above and below.</p>
+
+    <p>This is a second paragraph. Notice the gap between paragraphs — that's the default margin browsers apply.</p>
+
+    <h3>Subsection (h3)</h3>
+    <p>
+        Headings should follow a logical hierarchy. Don't skip levels
+        (e.g., don't jump from h2 to h4). This matters for accessibility
+        — screen readers use heading levels to navigate the page.
+    </p>
+
+    <h2>Inline Text Formatting</h2>
+
+    <p>
+        Use <strong>strong</strong> for important text (renders bold by default).
+        Use <em>em</em> for emphasis (renders italic by default).
+        These carry <strong>semantic meaning</strong>, not just visual styling.
+    </p>
+
+    <p>
+        Use <code>&lt;code&gt;</code> for inline code like <code>console.log()</code>.
+        Use <span>span</span> as a generic inline container — it has no meaning on its own,
+        but is useful for styling with CSS later.
+    </p>
+
+    <h2>Block-Level Elements</h2>
+
+    <!-- <div> is a generic block container with no semantic meaning -->
+    <div>
+        <p>This paragraph is inside a <code>&lt;div&gt;</code>. Divs are used to group elements for layout/styling.</p>
+    </div>
+
+    <!-- <blockquote> for extended quotations -->
+    <blockquote>
+        "The best way to learn HTML is to write HTML." — Every web developer ever.
+    </blockquote>
+
+    <!-- <pre> preserves whitespace and line breaks exactly as written -->
+    <pre>
+function hello() {
+    return "world";
+}
+    </pre>
+
+    <h2>Line Breaks vs Paragraphs</h2>
+    <p>
+        Use <code>&lt;br&gt;</code> only when line breaks are part of the content itself,<br>
+        like in a poem<br>
+        or an address.
+    </p>
+    <p>For separate thoughts, use separate <code>&lt;p&gt;</code> tags instead of <code>&lt;br&gt;</code>.</p>
+
+    <!-- HTML comments are not rendered in the browser -->
+    <!-- They are useful for notes to yourself or other developers -->
+
+</body>
+</html>

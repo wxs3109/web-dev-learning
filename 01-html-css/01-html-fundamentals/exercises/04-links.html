@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 4: Links</title>
+</head>
+<body>
+
+    <!--
+        EXERCISE 4: Links and Navigation
+        =================================
+
+        Practice creating different types of links.
+
+        Tasks:
+        1. Create a link to an external website (opens in same tab)
+        2. Create a link to an external website (opens in new tab, with proper rel attribute)
+        3. Create a link to exercise 03 (relative path to another file)
+        4. Create a mailto: link with your email
+        5. Create an in-page navigation:
+           - Add a nav section at the top with links to 3 sections below
+           - Each section should have an id attribute
+           - The nav links should use # fragment links to jump to those sections
+           - Add a "Back to top" link at the bottom
+    -->
+
+    <h1 id="top">Link Exercises</h1>
+
+    <!-- Task 1: External link (same tab) -->
+    <p><a href="https://developer.mozilla.org">MDN Web Docs</a></p>
+    <!-- what does a mean? The <a> element defines a hyperlink, which is used to link from one page to another. -->
+
+    <!-- Task 2: External link (new tab) -->
+    <!--
+        TODO: Link to any website, opening in a new tab.
+        Remember: use target="_blank" and rel="noopener noreferrer"
+        Why? rel="noopener" prevents the new page from accessing window.opener
+    -->
+    <p><a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a></p>
+
+    <!-- Task 3: Relative link to another exercise file -->
+    <p><a href="03-lists.html">Exercise 3: Lists</a></p>
+
+    <!-- Task 4: Email link -->
+    <p><a href="mailto:wxs3109@gmail.com">Email Me</a></p>
+
+    <!-- Task 5: In-page navigation -->
+    <!--
+        TODO: Create a <nav> element with a list of links.
+        Each link should point to a section below using href="#section-id"
+    -->
+    <nav>
+        <ul>
+            <li><a href="#section1">Introduction</a></li>
+            <li><a href="#section2">Link Types</a></li>
+            <li><a href="#section3">Best Practices</a></li>
+        </ul>
+    </nav>
+
+    <!--
+        TODO: Create 3 sections below, each with:
+        - An id attribute matching the nav links above
+        - An h2 heading
+        - A paragraph of text (any content)
+        Add enough content or <br> tags so the page scrolls.
+    -->
+    <h2 id="section1">Section 1: Introduction</h2>
+    <p>This is the introduction section. It provides an overview of the topics covered in this exercise.</p>
+    <br><br><br><br><br>     
+    <!--what does <br> mean? The <br> element inserts a line break, creating vertical space between elements. -->
+    <h2 id="section2">Section 2: Link Types</h2>
+    <p>In this section, we explore different types of links in HTML, including external links, relative links, and mailto links.</p>
+    <br><br><br><br><br>
+    <h2 id="section3">Section 3: Best Practices</h2>
+    <p>This section covers best practices for using links in HTML, including accessibility considerations and security tips.</p>
+    <br><br><br><br><br>
+
+    <!-- TODO: "Back to top" link (hint: you'll need an id at the top of the page) -->
+    <p><a href="#top">Back to top</a></p>
+
+</body>
+</html>

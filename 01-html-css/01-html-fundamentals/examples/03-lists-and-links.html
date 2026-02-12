@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lists and Links</title>
+</head>
+<body>
+
+    <h1>Lists and Links</h1>
+
+    <!-- ==================== UNORDERED LISTS ==================== -->
+    <h2>Unordered List (bullet points)</h2>
+    <p>Use <code>&lt;ul&gt;</code> when the order of items doesn't matter.</p>
+    <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+    </ul>
+
+    <!-- ==================== ORDERED LISTS ==================== -->
+    <h2>Ordered List (numbered)</h2>
+    <p>Use <code>&lt;ol&gt;</code> when sequence matters (steps, rankings).</p>
+    <ol>
+        <li>Learn HTML structure</li>
+        <li>Learn CSS styling</li>
+        <li>Learn JavaScript interactivity</li>
+    </ol>
+
+    <!-- ==================== NESTED LISTS ==================== -->
+    <h2>Nested Lists</h2>
+    <p>Lists can be nested inside each other.</p>
+    <ul>
+        <li>Front-end
+            <ul>
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+            </ul>
+        </li>
+        <li>Back-end
+            <ul>
+                <li>Node.js</li>
+                <li>Python</li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- ==================== LINKS ==================== -->
+    <h2>Links (Anchor Tags)</h2>
+
+    <!-- External link -->
+    <p><a href="https://developer.mozilla.org">MDN Web Docs</a> — best reference for web technologies.</p>
+
+    <!-- Open in new tab -->
+    <p><a href="https://developer.mozilla.org" target="_blank" rel="noopener noreferrer">MDN (opens in new tab)</a></p>
+    <!-- rel="noopener noreferrer" is a security best practice with target="_blank" -->
+
+    <!-- Link to another file in the same folder -->
+    <p><a href="01-document-structure.html">Go to Document Structure example</a></p>
+
+    <!-- Link to a section within the same page using id -->
+    <p><a href="#bottom">Jump to bottom of page</a></p>
+
+    <!-- Email link -->
+    <p><a href="mailto:example@example.com">Send an email</a></p>
+
+    <br><br><br><br><br>
+    <p id="bottom">You jumped here using a fragment link (#bottom).</p>
+
+</body>
+</html>
