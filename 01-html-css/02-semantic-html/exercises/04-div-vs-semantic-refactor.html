@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 4: Div vs Semantic Refactor</title>
+</head>
+<body>
+
+    <!--
+        EXERCISE 4: Div vs Semantic Refactor
+        ===================================
+
+        Refactor the structure below by replacing generic <div> elements
+        with semantic alternatives.
+
+        Tasks:
+        1. Replace top banner div with <header>
+        2. Replace menu div with <nav>
+        3. Replace content div with <main>
+        4. Replace each post div with <article>
+        5. Replace sidebar div with <aside>
+        6. Replace bottom div with <footer>
+        7. Keep headings and text content unchanged
+
+        Goal: Choose semantic tags when they describe purpose better than <div>.
+    -->
+
+    <div>
+        <h1>My Tech Blog</h1>
+        <p>Thoughts on front-end development.</p>
+    </div>
+
+    <div>
+        <a href="#">Home</a>
+        <a href="#">Posts</a>
+        <a href="#">About</a>
+    </div>
+
+    <div>
+        <h2>Latest Posts</h2>
+
+        <div>
+            <h3>Why Semantic HTML Matters</h3>
+            <p>Semantic elements improve structure, accessibility, and maintainability.</p>
+        </div>
+
+        <div>
+            <h3>Accessibility Basics</h3>
+            <p>Good structure helps screen reader users navigate faster.</p>
+        </div>
+    </div>
+
+    <div>
+        <h2>Related Links</h2>
+        <p>Read MDN docs for deeper reference.</p>
+    </div>
+
+    <div>
+        <p>Copyright 2026 My Tech Blog</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Landmarks</title>
+</head>
+<body>
+
+    <!--
+        Landmark elements are semantic regions that describe the page layout.
+        Screen readers can jump between landmarks to navigate quickly.
+        Common landmarks: header, nav, main, aside, and footer.
+    -->
+
+    <!--
+        <header> introduces the page (or a section):
+        usually includes title, logo, and short intro text.
+    -->
+    <header>
+        <h1>City Explorer</h1>
+        <p>Plan your next weekend trip.</p>
+    </header>
+
+    <!--
+        <nav> contains major navigation links.
+        aria-label helps assistive tech identify this nav block clearly.
+    -->
+    <nav aria-label="Primary">
+        <ul>
+            <li><a href="#destinations">Destinations</a></li>
+            <li><a href="#tips">Travel Tips</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!--
+        <main> wraps the primary unique content of the page.
+        A page should have only one <main> landmark.
+    -->
+    <main>
+        <!--
+            <section> groups related content under a shared topic.
+            It should usually have a heading.
+        -->
+        <section id="destinations">
+            <h2>Popular Destinations</h2>
+            <p>Choose a neighborhood based on your interests and budget.</p>
+        </section>
+
+        <section id="tips">
+            <h2>Quick Tips</h2>
+            <p>Book early for the best hotel prices and public transit passes.</p>
+        </section>
+    </main>
+
+    <!--
+        <footer> holds closing info such as contact, copyright,
+        related links, or legal text.
+    -->
+    <footer id="contact">
+        <p>Contact: <a href="mailto:travel@example.com">travel@example.com</a></p>
+    </footer>
+
+</body>
+</html>

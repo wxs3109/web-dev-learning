@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- lang 属性帮助屏幕阅读器选择正确发音语言 -->
+    <meta charset="UTF-8">
+    <!-- 让页面在手机上按设备宽度渲染 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Navigation and Focus Management</title>
+    <style>
+        /*
+            ===============================
+            Focus 样式总说明
+            ===============================
+            :focus 是一个伪类（pseudo-class）。
+            当元素“获得键盘焦点”时，这个状态会生效。
+            常见触发方式：按 Tab 键移动到该元素。
+        */
+
+        /*
+            a:focus
+            - 选择“获得焦点的链接 <a>”。
+            - 作用：用户 Tab 到链接时，显示明显边框。
+        */
+        a:focus,
+
+        /*
+            button:focus
+            - 选择“获得焦点的按钮 <button>”。
+            - 作用：键盘用户能看到当前按钮位置。
+        */
+        button:focus,
+
+        /*
+            input:focus
+            - 选择“获得焦点的输入框 <input>”。
+            - 作用：输入时焦点更清晰，避免迷失位置。
+        */
+        input:focus,
+
+        /*
+            [tabindex]:focus
+            - [tabindex] 是“属性选择器”，表示带 tabindex 属性的元素。
+            - :focus 表示这些元素在获得焦点时生效。
+            - 常用于把非原生可交互元素纳入键盘流程。
+        */
+        [tabindex]:focus {
+            /*
+                outline: 外轮廓线（不占布局空间）
+                3px 表示线宽，solid 表示实线，#2563eb 是颜色。
+            */
+            outline: 3px solid #2563eb;
+
+            /*
+                outline-offset: 让外轮廓和元素边缘留一点间距，
+                看起来更清楚，不会贴得太紧。
+            */
+            outline-offset: 2px;
+        }
+
+        /*
+            .skip-link
+            - 点号 . 表示“类选择器”，匹配 class="skip-link" 的元素。
+            - 这里用于“跳过导航链接”的默认隐藏样式。
+        */
+        .skip-link {
+            /*
+                position: absolute
+                把元素从常规文档流中拿出来，按 left/top 精确定位。
+            */
+            position: absolute;
+
+            /* 距离左边 8px */
+            left: 8px;
+
+            /*
+                top: -40px
+                把链接移到视窗上方（看不见），
+                这样普通鼠标用户不会一直看到它。
+            */
+            top: -40px;
+
+            /* 背景和文字颜色，提高可读性 */
+            background: #111827;
+            color: #ffffff;
+
+            /* 内边距，让链接更像一个按钮 */
+            padding: 8px 12px;
+
+            /* 去掉默认下划线，减少视觉干扰 */
+            text-decoration: none;
+        }
+
+        /*
+            .skip-link:focus
+            - 当 skip link 获得焦点时，把它移回可见区域。
+            - 这样键盘用户一上来就能看到并使用它。
+        */
+        .skip-link:focus {
+            top: 8px;
+        }
+
+        /*
+            dialog 选择器
+            - 选择所有 <dialog> 元素。
+            - 这里只加了基础边框和内边距，方便观察。
+            - 不是无障碍必须样式，仅用于教学展示。
+        */
+        dialog {
+            border: 1px solid #d1d5db;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!--
+        本示例演示：
+        1. 键盘导航
+        2. 跳过导航链接
+        3. tabindex 基础
+        4. 对话框打开/关闭时的焦点管理
+    -->
+
+    <!-- 键盘用户可直接跳到 main，避免重复读导航 -->
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header>
+        <h1>Keyboard Accessibility Demo</h1>
+    </header>
+
+    <!-- aria-label 为导航区提供可访问名称 -->
+    <nav aria-label="Main menu">
+        <a href="#home">Home</a>
+        <a href="#docs">Docs</a>
+        <a href="#support">Support</a>
+    </nav>
+
+    <main id="main-content">
+        <h2>Focusable Elements</h2>
+        <p>Use Tab and Shift+Tab to move through interactive controls.</p>
+
+        <!-- input/button 原生就可被键盘聚焦 -->
+        <input type="text" placeholder="Type here">
+        <button type="button">Regular Button</button>
+
+        <!--
+            tabindex="0": 把普通元素加入自然 Tab 顺序。
+            建议优先使用原生交互元素，tabindex 谨慎使用。
+        -->
+        <div tabindex="0" aria-label="Keyboard focus demo box">Focusable box (tabindex="0")</div>
+
+        <h2>Dialog Focus Management</h2>
+        <button id="open-dialog" type="button">Open Dialog</button>
+
+        <!--
+            dialog 是原生对话框。
+            aria-labelledby 把对话框标题绑定到 h3 文本。
+        -->
+        <dialog id="demo-dialog" role="dialog" aria-labelledby="dialog-title">
+            <h3 id="dialog-title">Confirm Action</h3>
+            <p>Focus moves into the dialog when opened and back to trigger on close.</p>
+            <button id="close-dialog" type="button">Close</button>
+        </dialog>
+    </main>
+
+    <script>
+        // 获取元素引用。
+        const openBtn = document.getElementById("open-dialog");
+        const closeBtn = document.getElementById("close-dialog");
+        const dialog = document.getElementById("demo-dialog");
+
+        // 打开时：显示对话框，并把焦点移入对话框内部。
+        openBtn.addEventListener("click", function () {
+            dialog.showModal();
+            closeBtn.focus();
+        });
+
+        // 关闭时：关闭对话框，并把焦点还给触发按钮。
+        closeBtn.addEventListener("click", function () {
+            dialog.close();
+            openBtn.focus();
+        });
+    </script>
+
+</body>
+</html>

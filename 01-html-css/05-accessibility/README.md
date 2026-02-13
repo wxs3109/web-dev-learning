@@ -1,4 +1,4 @@
-# Accessibility
+﻿# Accessibility
 
 ## Learning Objectives
 - Apply ARIA roles and attributes to enhance accessibility when native semantics are insufficient
@@ -29,8 +29,20 @@ Web accessibility (a11y) ensures that websites are usable by everyone, including
 - 02-semantic-html
 - 03-forms-and-validation
 
+## Examples
+
+| File | Concepts |
+| --- | --- |
+| [01-semantics-aria-alt-text.html](examples/01-semantics-aria-alt-text.html) | accessibility tree mindset, ARIA roles/attributes, alt text patterns, aria-live alerts |
+| [02-keyboard-and-focus.html](examples/02-keyboard-and-focus.html) | keyboard navigation, focus indicators, skip links, tabindex, dialog focus management |
+| [03-contrast-testing-wcag.html](examples/03-contrast-testing-wcag.html) | WCAG contrast basics, screen reader checklist, DevTools audits, WCAG POUR principles |
+
 ## Resources
-- TODO: Add resources
+- [MDN: Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+- [MDN: ARIA guide](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA)
+- [WebAIM: Alternative Text](https://webaim.org/techniques/alttext/)
+- [WebAIM: Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- [W3C: WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)
 
 ## Exercises
 - TODO: Add exercises

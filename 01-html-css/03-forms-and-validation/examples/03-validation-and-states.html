@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Attributes and States</title>
+    <style>
+        /*
+            These pseudo-classes are built into browsers.
+            They react to validation state without JavaScript.
+        */
+        input:valid {
+            border: 2px solid #1b8f3b;
+        }
+
+        input:invalid {
+            border: 2px solid red;
+        }
+
+        input:placeholder-shown {
+            background-color: #f5f7fb;
+        }
+    </style>
+</head>
+<body>
+
+    <!--
+        Example 3: Validation Attributes and CSS States
+        ----------------------------------------------
+        This file focuses on:
+        - required
+        - pattern
+        - minlength / maxlength
+        - min / max / step
+        - :valid, :invalid, :placeholder-shown
+    -->
+
+    <h1>Validation Demo Form</h1>
+
+    <form action="/submit-validation-demo" method="post">
+        <p>
+            <label for="username">Username (3-12 chars)</label><br>
+            <input
+                id="username"
+                name="username"
+                type="text"
+                minlength="3"
+                maxlength="12"
+                required
+                placeholder="e.g. student01"
+            >
+        </p>
+
+        <p>
+            <label for="student-id">Student ID (Format: STU-1234)</label><br>
+            <input
+                id="student-id"
+                name="studentId"
+                type="text"
+                pattern="STU-[0-9]{4}"
+                placeholder="STU-1234"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="age">Age (18 to 100)</label><br>
+            <input id="age" name="age" type="number" min="18" max="100" step="1" required>
+        </p>
+
+        <p>
+            <label for="score">Placement Score (0 to 100, steps of 5)</label><br>
+            <input id="score" name="score" type="number" min="0" max="100" step="5" placeholder="0, 5, 10, ...">
+        </p>
+
+        <button type="submit">Check Validation</button>
+    </form>
+
+</body>
+</html>

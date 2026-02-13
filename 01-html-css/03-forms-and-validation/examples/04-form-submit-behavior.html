@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submit Behavior</title>
+</head>
+<body>
+
+    <!--
+        Example 4: Form Submission Behavior
+        -----------------------------------
+        This file focuses on:
+        - default submit behavior
+        - submit event
+        - preventDefault()
+
+        这个示例想说明：
+        1) 表单默认会提交并跳转
+        2) JS 可以监听 submit
+        3) 用 preventDefault() 阻止默认跳转
+        4) 用 FormData 读取输入值
+        5) 把结果显示在当前页面
+    -->
+
+    <h1>Newsletter Signup</h1>
+
+    <p>
+        By default, submitting a form reloads/navigates to the URL in action.
+        We intercept submit below to show the values first.
+    </p>
+
+    <!--
+        默认行为说明：
+        - action="/newsletter" + method="post" 表示默认会 POST 到 /newsletter
+        - 如果没有 JS 拦截，点击提交后通常会发生页面跳转/刷新
+    -->
+    <form id="newsletter-form" action="/newsletter" method="post">
+        <p>
+            <label for="newsletter-email">Email</label><br>
+            <input id="newsletter-email" name="email" type="email" required>
+        </p>
+
+        <button type="submit">Subscribe</button>
+    </form>
+
+    <!-- 这里用于显示“拦截提交后”的结果文本 -->
+    <p id="result"></p>
+
+    <script>
+        // 1) 拿到表单元素和结果显示元素。
+        const form = document.getElementById("newsletter-form");
+        const result = document.getElementById("result");
+
+        // 2) 监听 submit 事件：用户点按钮或按回车提交时会触发。
+        form.addEventListener("submit", function (event) {
+            // 3) 阻止浏览器默认的提交跳转行为。
+            event.preventDefault();
+
+            // 4) 读取当前表单中的数据。
+            // FormData 会按 input 的 name 收集值，这里 name="email"。
+            const formData = new FormData(form);
+            const email = formData.get("email");
+
+            // 5) 在页面上显示结果，而不是提交到后端后跳转。
+            result.textContent = "Form submitted with email: " + email;
+        });
+    </script>
+
+</body>
+</html>

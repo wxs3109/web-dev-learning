@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video and Audio Embedding</title>
+</head>
+<body>
+
+    <!--
+        EXAMPLE 2: Video and Audio
+        ==========================
+
+        This file demonstrates:
+        - <video> attributes: controls, autoplay, loop, muted, poster
+        - multiple <source> elements for format fallback
+        - <audio> embedding with controls
+        - media accessibility basics
+    -->
+
+    <h1>Video and Audio Basics</h1>
+
+    <h2>1) Video with Controls and Poster</h2>
+    <!--
+        controls: browser playback UI
+        autoplay: start automatically (often blocked unless muted)
+        loop: replay automatically
+        muted: no sound by default, often required for autoplay
+        poster: placeholder image before video starts
+    -->
+    <video
+        controls
+        autoplay
+        muted
+        loop
+        poster="https://picsum.photos/id/1062/640/360"
+        width="640"
+        height="360"
+    >
+        <!-- Browser picks first supported source type -->
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm">
+        Your browser does not support the video element.
+    </video>
+
+    <h2>2) Audio with Fallback Sources</h2>
+    <audio controls>
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" type="audio/mpeg">
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <h2>Accessibility Notes</h2>
+    <ul>
+        <li>Use captions/subtitles for important video content.</li>
+        <li>Provide transcripts for audio-only content when possible.</li>
+        <li>Keep controls visible so keyboard users can operate media.</li>
+    </ul>
+
+</body>
+</html>

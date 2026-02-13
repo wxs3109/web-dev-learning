@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sections, Articles, and Aside</title>
+</head>
+<body>
+
+    <!-- Page-level intro content -->
+    <header>
+        <h1>Developer News</h1>
+        <p>Daily updates for front-end developers.</p>
+    </header>
+
+    <!-- Main unique content of this page -->
+    <main>
+        <!--
+            <section> groups related content into a thematic block.
+            aria-labelledby points to the section heading for clearer labeling.
+        -->
+        <section aria-labelledby="latest-news">
+            <!-- aria-labelledby is an accessibility attribute that associates the section with a heading -->
+            <h2 id="latest-news">Latest News</h2>
+
+            <!--
+                <article> is for self-contained content that could stand alone,
+                such as a post, card, news item, or comment thread.
+            -->
+            <article>
+                <h3>New CSS Feature Released</h3>
+                <p>Browsers now support a new layout feature that simplifies component design.</p>
+            </article>
+
+            <article>
+                <h3>JavaScript Runtime Update</h3>
+                <p>The latest runtime version improves performance for async operations.</p>
+            </article>
+        </section>
+
+        <!--
+            <aside> holds secondary content related to the main content,
+            such as sidebars, callouts, or related links.
+        -->
+        <aside>
+            <h2>Related Links</h2>
+            <ul>
+                <li><a href="https://developer.mozilla.org">MDN</a></li>
+                <li><a href="https://web.dev">web.dev</a></li>
+            </ul>
+        </aside>
+    </main>
+
+    <!-- Closing site or page metadata -->
+    <footer>
+        <p>&copy; 2026 Developer News</p>
+    </footer>
+
+</body>
+</html>

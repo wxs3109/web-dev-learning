@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrast, Testing, and WCAG Checklist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            margin: 24px;
+        }
+
+        /* 对比度高：可读性好 */
+        .good-contrast {
+            background: #111827;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        /* 对比度低：阅读困难 */
+        .bad-contrast {
+            background: #f3f4f6;
+            color: #9ca3af;
+            padding: 10px;
+        }
+
+        .awful-contrast {
+            background: #f3f4f6;
+            color: #d1d5db;
+            padding: 10px;
+        }   
+    </style>
+</head>
+<body>
+
+    <!--
+        本示例演示可访问性测试思路：
+        1. 颜色对比
+        2. 屏幕阅读器检查
+        3. DevTools 自动化审计
+        4. WCAG POUR 四原则
+    -->
+
+    <h1>Accessibility Testing Workflow</h1>
+
+    <h2>Color Contrast (WCAG AA)</h2>
+
+    <!-- 可读示例 -->
+    <p class="good-contrast">Good contrast: dark background with white text.</p>
+
+    <!-- 不可读示例 -->
+    <p class="bad-contrast">Poor contrast: light gray text on light background.</p>
+
+        <!-- 极差示例 -->
+    <p class="awful-contrast">Awful contrast: even lighter gray text on light background.</p>
+
+    <!-- 新手记忆点：普通文本一般至少 4.5:1 -->
+    <p>WCAG AA generally requires 4.5:1 contrast for normal text.</p>
+
+    <h2>Screen Reader Testing</h2>
+    <ul>
+        <li>Windows: NVDA or Narrator</li>
+        <li>macOS/iOS: VoiceOver</li>
+        <li>Check heading order, landmarks, link text, and form labels</li>
+    </ul>
+
+    <!--
+        手工测试要点：
+        - 只用键盘能否完成关键流程
+        - 读屏器能否理解页面结构
+        - 表单提示和错误是否能被读到
+    -->
+
+    <h2>DevTools Audits</h2>
+    <ul>
+        <li>Run Lighthouse accessibility audit in browser DevTools</li>
+        <li>Use axe extension for additional automated checks</li>
+        <li>Always manually verify keyboard and screen reader behavior</li>
+    </ul>
+
+    <!-- 自动化工具很有用，但不能替代人工评估 -->
+
+    <h2>WCAG 2.1 Principles (POUR)</h2>
+    <ul>
+        <li><strong>Perceivable:</strong> information must be presentable to users</li>
+        <li><strong>Operable:</strong> interface must be usable with keyboard and controls</li>
+        <li><strong>Understandable:</strong> content and behavior must be clear</li>
+        <li><strong>Robust:</strong> content should work across browsers and assistive tech</li>
+    </ul>
+
+</body>
+</html>

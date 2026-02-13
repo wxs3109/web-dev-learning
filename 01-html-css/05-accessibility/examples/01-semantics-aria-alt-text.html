@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+        lang="en" 告诉浏览器和辅助技术（如屏幕阅读器）页面主要语言是英语。
+        这会影响朗读发音、翻译和搜索引擎理解。
+    -->
+    <meta charset="UTF-8">
+    <!--
+        viewport 让页面在手机上按设备宽度渲染，避免缩放错乱。
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Basics: Semantics, ARIA, and Alt Text</title>
+</head>
+<body>
+
+    <!--
+        本示例目标（给新手）：
+        1) 先用语义化 HTML（header/nav/main/section...）
+        2) 只在“语义不够表达”时再加 ARIA
+        3) 学会写正确的 alt 文本
+        4) 学会 aria-describedby 和 aria-live 的典型场景
+
+        重要原则：
+        - "No ARIA is better than bad ARIA"（错用 ARIA 比不用更糟）
+        - 优先原生语义元素，再考虑 role/aria-*
+    -->
+
+    <!--
+        <header> 是页面头部语义区域。
+        屏幕阅读器用户可按地标（landmark）快速跳转到这里。
+    -->
+    <header>
+        <h1>Accessibility Starter Page</h1>
+        <p>Use semantic HTML first, then add ARIA when native semantics are not enough.</p>
+    </header>
+
+    <!--
+        <nav> 本身已经是导航语义。
+        aria-label="Primary navigation" 给这个导航区一个可访问名称，
+        当页面里有多个 nav 时尤其有用（例如主导航、页脚导航）。
+    -->
+    <nav aria-label="Primary navigation">
+        <ul>
+            <li><a href="#images">Images</a></li>
+            <li><a href="#alerts">Live Alerts</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!--
+        <main> 表示页面主体内容。
+        一个页面通常只应有一个 main。
+    -->
+    <main>
+
+        <!--
+            aria-labelledby="images-title"：
+            表示这个 section 的“可访问名称”来自 id=images-title 的元素文本。
+            好处：结构更清晰，辅助技术更容易读懂这个区块是什么。
+        -->
+        <section id="images" aria-labelledby="images-title">
+            <h2 id="images-title">Alt Text Examples</h2>
+
+            <h3>Informative Image</h3>
+            <!--
+                informative（有信息价值）的图片：
+                alt 要写“图片传达的关键信息”，而不是只写 "image" / "photo"。
+                这里 alt="Black dog looking toward the camera" 是可用的描述。
+            -->
+            <img
+                src="https://picsum.photos/id/237/320/180"
+                alt="Black dog looking toward the camera"
+                width="320"
+                height="180"
+            >
+
+            <h3>Decorative Image</h3>
+            <!--
+                decorative（纯装饰）图片：
+                alt 应该是空字符串 alt=""，这样屏幕阅读器会跳过。
+                注意：不要省略 alt 属性；省略时很多读屏器会读文件名或 URL，体验更差。
+            -->
+            <img
+                src="https://picsum.photos/id/1060/320/180"
+                alt=""
+                width="320"
+                height="180"
+            >
+
+            <h3>Complex Image Guidance</h3>
+            <!--
+                complex（复杂图表）图片：
+                做法通常是“短 alt + 附近详细文字说明”。
+                因为 alt 不适合承载太长、太复杂的数据解释。
+            -->
+            <p>For charts/diagrams, use a short alt and add a nearby long explanation.</p>
+        </section>
+
+        <section id="alerts" aria-labelledby="alerts-title">
+            <h2 id="alerts-title">ARIA Attributes and Live Region</h2>
+
+            <!--
+                label + for + input id 的绑定是表单可访问性的基础。
+                点击文字 "Email" 时，焦点会进入输入框。
+            -->
+            <label for="email">Email</label>
+
+            <!--
+                aria-describedby="email-help"：
+                让读屏器在读输入框时，同时读到帮助说明（id=email-help 的文本）。
+                适合“格式提示/补充说明/错误提示关联”等场景。
+            -->
+            <input
+                id="email"
+                type="email"
+                aria-describedby="email-help"
+                placeholder="name@example.com"
+            >
+            <p id="email-help">We only use this for account notifications.</p>
+
+            <!--
+                role="alert" + aria-live="assertive"：
+                当这个区域文本变化时，读屏器会立即播报（紧急级别）。
+
+                适用：关键错误、阻断操作的问题。
+                不适用：普通提示（普通提示更建议 aria-live="polite"）。
+            -->
+            <div id="status" role="alert" aria-live="assertive"></div>
+
+            <!-- 按钮点击后，通过 JS 改变 status 文本，触发读屏器播报 -->
+            <button id="show-alert" type="button">Trigger Alert Message</button>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <p>Contact: <a href="mailto:a11y@example.com">a11y@example.com</a></p>
+    </footer>
+
+    <script>
+        // 获取按钮和 alert 区域 DOM。
+        const button = document.getElementById("show-alert");
+        const status = document.getElementById("status");
+
+        // 点击按钮后更新 alert 文本。
+        // 因为该 div 是 live region，读屏器会自动播报这条消息。
+        button.addEventListener("click", function () {
+            status.textContent = "Error: Please enter a valid email address.";
+        });
+    </script>
+
+</body>
+</html>

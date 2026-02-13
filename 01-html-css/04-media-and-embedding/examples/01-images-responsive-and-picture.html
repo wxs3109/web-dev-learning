@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Images, Srcset, Picture, and Performance</title>
+</head>
+<body>
+
+    <!--
+        EXAMPLE 1: Images and Responsive Images
+        =======================================
+
+        This file demonstrates:
+        - <img> core attributes: src, alt, width, height
+        - responsive images with srcset + sizes
+        - <picture> for art direction / source selection
+        - loading="lazy" and decoding="async"
+        - accessibility basics for images
+    -->
+
+    <h1>Image Embedding Fundamentals</h1>
+
+    <h2>1) Basic Image</h2>
+    <!--
+        src      = image source URL
+        alt      = text alternative for screen readers and load failures
+        width/height = reserve layout space to reduce visual jumping (CLS)
+    -->
+    <img
+        src="https://picsum.photos/id/1015/640/360"
+        alt="Mountain landscape with trees and a lake"
+        width="640"
+        height="360"
+    >
+
+    <h2>2) Native Lazy Loading and Decoding</h2>
+    <!--
+        loading="lazy" delays loading until image is near viewport.
+        decoding="async" lets browser decode off the critical render path.
+    -->
+    <img
+        src="https://picsum.photos/id/1025/800/400"
+        alt="Dog portrait photo"
+        width="800"
+        height="400"
+        loading="lazy"
+        decoding="async"
+    >
+
+    <h2>3) Responsive Image with srcset and sizes</h2>
+    <!--
+        srcset provides multiple width candidates.
+        sizes tells browser expected rendered width at different viewport sizes.
+        Browser selects the most appropriate file automatically.
+    -->
+    <img
+        src="https://picsum.photos/id/1035/600/300"
+        srcset="
+            https://picsum.photos/id/1035/400/200 400w,
+            https://picsum.photos/id/1035/800/400 800w,
+            https://picsum.photos/id/1035/1200/600 1200w
+        "
+        sizes="(max-width: 640px) 100vw, 640px"
+        alt="Beach view in different responsive sizes"
+        width="600"
+        height="300"
+    >
+
+    <h2>4) Picture Element</h2>
+    <!--
+        <picture> is useful when you want different crops/art direction by screen size.
+        Browser uses the first matching <source>; <img> is fallback.
+    -->
+    <picture>
+        <source
+            media="(max-width: 600px)"
+            srcset="https://picsum.photos/id/1040/420/560"
+        >
+        <source
+            media="(min-width: 601px)"
+            srcset="https://picsum.photos/id/1040/900/360"
+        >
+        <img
+            src="https://picsum.photos/id/1040/900/360"
+            alt="Forest path photo shown through picture fallback"
+            width="900"
+            height="360"
+        >
+    </picture>
+
+    <h2>Accessibility Notes</h2>
+    <ul>
+        <li>Use meaningful <code>alt</code> text for informative images.</li>
+        <li>Use empty alt (<code>alt=""</code>) for decorative images only.</li>
+        <li>Do not place important text inside images when possible.</li>
+    </ul>
+
+</body>
+</html>

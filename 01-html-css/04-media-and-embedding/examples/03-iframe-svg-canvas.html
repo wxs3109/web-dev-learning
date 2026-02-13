@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe, SVG, and Canvas</title>
+</head>
+<body>
+
+    <!--
+        EXAMPLE 3: Iframe, SVG, Canvas
+        ==============================
+
+        This file demonstrates:
+        - iframe embedding with src, sandbox, allow, loading
+        - inline SVG basics
+        - canvas 2D context basics
+        - SVG vs raster guidance
+    -->
+
+    <h1>Embedding and Drawing Tools</h1>
+
+    <h2>1) Iframe Embedding</h2>
+    <!--
+        src      = external page URL
+        loading  = lazy-load offscreen iframe
+        sandbox  = security restrictions for embedded content
+        allow    = explicit feature permissions
+        title    = accessibility name for assistive technology
+    -->
+    <iframe
+        src="https://example.com"
+        title="Example embedded page"
+        width="640"
+        height="280"
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin"
+        allow="fullscreen"
+    ></iframe>
+
+    <h2>2) Inline SVG</h2>
+    <!--
+        SVG is vector-based: scales sharply at any size.
+        Prefer SVG for icons, logos, and simple illustrations.
+    -->
+    <svg width="240" height="120" viewBox="0 0 240 120" role="img" aria-label="Simple SVG badge">
+        <rect x="10" y="10" width="220" height="100" rx="12" fill="#e8f0fe" stroke="#2563eb"></rect>
+        <circle cx="60" cy="60" r="24" fill="#2563eb"></circle>
+        <text x="96" y="66" font-size="16" fill="#0f172a">Inline SVG</text>
+    </svg>
+
+    <p>Use raster images (JPG/PNG/WebP) for complex photos. Use SVG for scalable graphics.</p>
+
+    <h2>3) Canvas Basics</h2>
+    <!--
+        Canvas is pixel-based and controlled by JavaScript.
+        It is good for dynamic drawings, charts, and games.
+    -->
+    <canvas id="demo-canvas" width="340" height="140" style="border: 1px solid #cbd5e1;">
+        Your browser does not support the canvas element.
+    </canvas>
+
+    <script>
+        // Access 2D drawing context.
+        const canvas = document.getElementById("demo-canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Draw rectangle.
+        ctx.fillStyle = "#2563eb";
+        ctx.fillRect(20, 20, 110, 60);
+
+        // Draw circle.
+        ctx.beginPath();
+        ctx.arc(190, 50, 28, 0, Math.PI * 2);
+        ctx.fillStyle = "#16a34a";
+        ctx.fill();
+
+        // Draw text.
+        ctx.fillStyle = "#111827";
+        ctx.font = "16px sans-serif";
+        ctx.fillText("Canvas 2D demo", 20, 112);
+    </script>
+
+</body>
+</html>

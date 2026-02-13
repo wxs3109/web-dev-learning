@@ -25,8 +25,25 @@ Semantic HTML uses elements that convey meaning about the content they contain, 
 ## Prerequisites
 - 01-html-fundamentals
 
-## Resources
-- TODO: Add resources
+## Examples
+
+| File | Concepts |
+| --- | --- |
+| [01-landmark-layout.html](examples/01-landmark-layout.html) | header, nav, main, section, footer landmarks |
+| [02-section-article-aside.html](examples/02-section-article-aside.html) | section, article, aside content structure |
+| [03-semantic-content-tags.html](examples/03-semantic-content-tags.html) | figure, figcaption, time, mark, address, semantic meaning |
 
 ## Exercises
-- TODO: Add exercises
+
+| File | Task |
+| --- | --- |
+| [01-semantic-landmarks.html](exercises/01-semantic-landmarks.html) | Build a basic semantic layout using landmark elements |
+| [02-article-structure.html](exercises/02-article-structure.html) | Create a mini news page with section/article/time/aside |
+| [03-semantic-page-challenge.html](exercises/03-semantic-page-challenge.html) | Capstone: build a complete event page with semantic elements |
+| [04-div-vs-semantic-refactor.html](exercises/04-div-vs-semantic-refactor.html) | Refactor generic div-based markup into semantic elements |
+
+## Resources
+
+- [MDN: Semantic HTML](https://developer.mozilla.org/en-US/docs/Glossary/Semantics)
+- [MDN: HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
+- [MDN: HTML landmark elements](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/landmark_role)

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection and Specialized Inputs</title>
+</head>
+<body>
+
+    <!--
+        Example 2: Selection and Specialized Inputs
+        -------------------------------------------
+        This file focuses on:
+        - checkbox, radio
+        - select, datalist
+        - number, range, date, time, datetime-local
+        - file, color, hidden
+        - fieldset and legend
+    -->
+
+    <h1>Workshop Registration</h1>
+
+    <form action="/register" method="post">
+
+        <!--
+            fieldset groups related controls.
+            legend provides the group title.
+        -->
+        <fieldset>
+            <legend>Choose Your Track</legend>
+
+            <!-- Radio buttons: same name => one selection only -->
+            <label>
+                <input type="radio" name="track" value="frontend" required>
+                Front-end
+            </label><br>
+            <label>
+                <input type="radio" name="track" value="backend">
+                Back-end
+            </label><br>
+            <label>
+                <input type="radio" name="track" value="fullstack">
+                Full-stack
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Tools You Use</legend>
+
+            <!-- Checkboxes: same name is fine, user can choose multiple -->
+            <label><input type="checkbox" name="tools" value="vscode"> VS Code</label><br>
+            <label><input type="checkbox" name="tools" value="git"> Git</label><br>
+            <label><input type="checkbox" name="tools" value="figma"> Figma</label>
+        </fieldset>
+
+        <p>
+            <label for="experience">Years of Experience</label><br>
+            <input id="experience" name="experience" type="number" min="0" max="40" step="1" value="0">
+        </p>
+
+        <p>
+            <label for="confidence">Confidence Level (0 to 10)</label><br>
+            <input id="confidence" name="confidence" type="range" min="0" max="10" step="1" value="5">
+        </p>
+
+        <p>
+            <label for="start-date">Preferred Start Date</label><br>
+            <input id="start-date" name="startDate" type="date">
+        </p>
+
+        <p>
+            <label for="start-time">Preferred Start Time</label><br>
+            <input id="start-time" name="startTime" type="time">
+        </p>
+
+        <p>
+            <label for="session">Preferred Session (Date + Time)</label><br>
+            <input id="session" name="session" type="datetime-local">
+        </p>
+
+        <p>
+            <label for="city">City</label><br>
+            <input id="city" name="city" list="city-options" placeholder="Start typing a city">
+            <datalist id="city-options">
+                <option value="Toronto"></option>
+                <option value="Vancouver"></option>
+                <option value="Montreal"></option>
+            </datalist>
+        </p>
+
+        <p>
+            <label for="shirt-size">T-shirt Size</label><br>
+            <select id="shirt-size" name="shirtSize">
+                <option value="">Select a size</option>
+                <option value="s">Small</option>
+                <option value="m">Medium</option>
+                <option value="l">Large</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="resume">Upload Resume</label><br>
+            <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx">
+        </p>
+
+        <p>
+            <label for="favorite-color">Favorite Color</label><br>
+            <input id="favorite-color" name="favoriteColor" type="color" value="#2f6fed">
+        </p>
+
+        <!-- Hidden inputs send data that users don't edit directly -->
+        <input type="hidden" name="campaign" value="spring-bootcamp">
+
+        <button type="submit">Register</button>
+    </form>
+
+</body>
+</html>

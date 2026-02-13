@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Basics and Text Inputs</title>
+</head>
+<body>
+
+    <!--
+        Example 1: Form Basics and Text Inputs
+        --------------------------------------
+        This file focuses on:
+        - <form> with action and method
+        - labels connected to controls
+        - common text-based input types
+        - textarea
+        - submit button types
+    -->
+
+    <h1>Account Signup Form</h1>
+
+    <!--
+        action: where data is sent after submit
+        method: how data is sent (GET shows query in URL, POST sends in request body)
+        Here we use POST because signup data is sensitive.
+    -->
+    <form action="/signup" method="post">
+    <!-- what does action ="/signup" mean? It specifies the URL where the form data will be sent when the form is submitted. -->
+
+        <!--
+            Always pair <label> with an input using for="id".
+            This improves accessibility and makes labels clickable.
+        -->
+        <p>
+            <label for="full-name">Full Name</label><br>
+            <input id="full-name" name="fullName" type="text" placeholder="Ada Lovelace" required>
+        </p>
+
+        <p>
+            <label for="email">Email</label><br>
+            <input id="email" name="email" type="email" placeholder="name@example.com" required>
+        </p>
+
+        <p>
+            <label for="password">Password</label><br>
+            <input id="password" name="password" type="password" minlength="8" required>
+        </p>
+
+        <p>
+            <label for="website">Portfolio URL</label><br>
+            <input id="website" name="website" type="url" placeholder="https://example.com">
+        </p>
+
+        <p>
+            <label for="phone">Phone</label><br>
+            <input id="phone" name="phone" type="tel" placeholder="123-456-7890">
+        </p>
+
+        <p>
+            <label for="search">Search Interests</label><br>
+            <input id="search" name="search" type="search" placeholder="HTML forms">
+        </p>
+
+        <!-- <textarea> is used for multi-line input -->
+        <p>
+            <label for="bio">Short Bio</label><br>
+            <textarea id="bio" name="bio" rows="4" cols="40" placeholder="Tell us a bit about yourself"></textarea>
+        </p>
+
+        <!--
+            <button type="submit"> is flexible because it can contain text/icons.
+            <input type="submit"> is older but still valid.
+        -->
+        <button type="submit">Create Account</button>
+        <input type="submit" value="Submit (input type)">
+    </form>
+
+</body>
+</html>
