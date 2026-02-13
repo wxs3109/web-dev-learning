@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inheritance and Box Model</title>
+    <style>
+        /* ============================================================
+           PART 1 — CSS 继承 (Inheritance)
+           CSS 中有些属性会自动从父元素传递给子元素，比如：
+             color, font-family, font-size, line-height, visibility …
+           而有些属性不会继承，比如：
+             margin, padding, border, width, height, background …
+
+           你可以用下面四个关键字来手动控制继承行为：
+             inherit  — 强制继承父元素的值
+             initial  — 重置为 CSS 规范中定义的初始值
+             unset    — 如果该属性本来就会继承，就继承；否则用 initial
+             revert   — 回退到浏览器默认样式
+           ============================================================ */
+
+        body { font-family: Arial, sans-serif; }
+
+        /*
+         * 父元素：文字颜色设为蓝色 (#1d4ed8)
+         * 下面的子元素会用不同关键字来演示对 color 的控制
+         */
+        .parent {
+            color: #1d4ed8;
+            margin-bottom: 16px;
+        }
+
+        /*
+         * inherit — 继承父元素的 color
+         * color 本身就是可继承属性，所以这里写 inherit 和不写效果一样，
+         * 但显式写出来可以让意图更清晰。
+         * 结果：蓝色（和父元素一样）
+         */
+        .inherit { color: inherit; }
+
+        /*
+         * initial — 重置为 CSS 规范定义的初始值
+         * color 的初始值在大部分浏览器是黑色。
+         * 注意：initial 不是"浏览器默认值"，而是 CSS 规范的初始值。
+         * 结果：黑色
+         */
+        .initial { color: initial; }
+
+        /*
+         * unset — "如果这个属性本来会继承，就继承；否则用 initial"
+         * 因为 color 是可继承属性，所以 unset 等于 inherit。
+         * 结果：蓝色（继承父元素）
+         */
+        .unset { color: unset; }
+
+        /*
+         * revert — 回退到上一个样式来源的值
+         * 样式来源优先级：作者样式 > 用户样式 > 浏览器默认样式
+         * revert 会跳过我们写的 CSS，回到浏览器默认的 color。
+         * 结果：黑色（浏览器默认）
+         *
+         * revert 和 initial 的区别：
+         *   initial → CSS 规范的初始值（对所有属性都一样）
+         *   revert  → 浏览器默认样式表的值（可能因元素而异）
+         */
+        .revert { color: revert; }
+
+
+        /* ============================================================
+           PART 2 — 盒模型 (Box Model)
+           每个 HTML 元素都是一个"盒子"，由四层组成（从内到外）：
+
+           ┌─────────────────────────────────┐
+           │            margin               │  ← 外边距：盒子与外部的距离
+           │  ┌───────────────────────────┐  │
+           │  │         border            │  │  ← 边框
+           │  │  ┌───────────────────┐    │  │
+           │  │  │     padding       │    │  │  ← 内边距：内容与边框的距离
+           │  │  │  ┌───────────┐    │    │  │
+           │  │  │  │  content  │    │    │  │  ← 实际内容区域
+           │  │  │  └───────────┘    │    │  │
+           │  │  └───────────────────┘    │  │
+           │  └───────────────────────────┘  │
+           └─────────────────────────────────┘
+
+           关键问题：你设置的 width 到底指的是哪一层的宽度？
+           这取决于 box-sizing 属性。
+           ============================================================ */
+
+        /*
+         * content-box（默认值）
+         * width 只指 content 区域的宽度。
+         * 最终渲染宽度 = width + padding左右 + border左右
+         *              = 200 + 20*2 + 6*2
+         *              = 200 + 40 + 12
+         *              = 252px ← 比你写的 200px 宽得多！
+         *
+         * 这就是为什么很多初学者觉得"宽度不对"的原因。
+         */
+        .box-content {
+            box-sizing: content-box;
+            width: 200px;
+            padding: 20px;
+            border: 6px solid #60a5fa;
+            margin: 12px 0;
+            background: #eff6ff;
+        }
+
+        /*
+         * border-box（推荐使用）
+         * width 包含了 content + padding + border 三者。
+         * 最终渲染宽度 = 200px（就是你写的值，所见即所得）
+         * 内容区域会自动缩小：200 - 20*2 - 6*2 = 148px
+         *
+         * 实际项目中，几乎所有现代 CSS 都会在最开头加上：
+         *   *, *::before, *::after { box-sizing: border-box; }
+         * 这样所有元素都用 border-box，计算宽度更直观。
+         */
+        .box-border {
+            box-sizing: border-box;
+            width: 200px;
+            padding: 20px;
+            border: 6px solid #2563eb;
+            margin: 12px 0;
+            background: #dbeafe;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inheritance and Box Model</h1>
+
+    <!-- ========== 继承关键字演示 ==========
+         父元素 .parent 的文字颜色是蓝色。
+         下面每个 <p> 用不同的关键字来控制是否继承这个蓝色。
+         打开浏览器看看每行文字的颜色，对照注释理解。 -->
+    <div class="parent">
+        Parent text is blue. （父元素文字是蓝色）
+
+        <!-- inherit: 强制继承 → 蓝色 -->
+        <p class="inherit">inherit: 继承父元素的颜色 → 蓝色</p>
+
+        <!-- initial: 重置为 CSS 规范初始值 → 黑色 -->
+        <p class="initial">initial: 重置为规范初始值 → 黑色</p>
+
+        <!-- unset: color 是可继承属性，所以等于 inherit → 蓝色 -->
+        <p class="unset">unset: 可继承属性 → 等于 inherit → 蓝色</p>
+
+        <!-- revert: 回退到浏览器默认样式 → 黑色 -->
+        <p class="revert">revert: 回退到浏览器默认 → 黑色</p>
+    </div>
+
+    <!-- ========== 盒模型演示 ==========
+         下面两个 div 都写了 width: 200px，但实际渲染宽度不同。
+         用浏览器的开发者工具 (F12) 检查元素，
+         可以在 "Computed" 面板看到最终的盒模型尺寸。 -->
+
+    <!-- content-box: 200px 只是内容宽度，加上 padding 和 border 后总宽 = 252px -->
+    <div class="box-content">content-box: 最终渲染宽度 = 252px（比 200px 宽）</div>
+
+    <!-- border-box: 200px 包含了 content + padding + border，所见即所得 -->
+    <div class="box-border">border-box: 最终渲染宽度 = 200px（所见即所得）</div>
+</body>
+</html>

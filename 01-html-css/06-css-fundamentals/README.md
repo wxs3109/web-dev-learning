@@ -1,4 +1,4 @@
-# CSS Fundamentals
+﻿# CSS Fundamentals
 
 ## Learning Objectives
 - Write CSS selectors of varying specificity to target HTML elements
@@ -29,8 +29,21 @@ CSS (Cascading Style Sheets) controls the visual presentation of HTML documents.
 - 01-html-fundamentals
 - 02-semantic-html
 
+## Examples
+
+| File | Concepts |
+| --- | --- |
+| [01-selectors-and-pseudo.html](examples/01-selectors-and-pseudo.html) | style linking via `<style>`, type/class/id/attribute selectors, pseudo-classes, pseudo-elements |
+| [02-combinators-cascade-specificity.html](examples/02-combinators-cascade-specificity.html) | combinators, cascade, specificity, source order, `!important` |
+| [03-inheritance-and-box-model.html](examples/03-inheritance-and-box-model.html) | inheritance keywords (`inherit`, `initial`, `unset`, `revert`), content-box vs border-box, spacing impact |
+| [04-display-and-units.html](examples/04-display-and-units.html) | display values (`block`, `inline`, `inline-block`, `none`), unit choices (`px`, `em`, `rem`, `%`, `vw`, `vh`, `ch`) |
+
 ## Resources
-- TODO: Add resources
+- [MDN: CSS first steps](https://developer.mozilla.org/en-US/docs/Learn/CSS/First_steps)
+- [MDN: CSS selectors](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors)
+- [MDN: Cascade and inheritance](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Cascade_and_inheritance)
+- [MDN: The box model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model)
+- [MDN: Values and units](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units)
 
 ## Exercises
 - TODO: Add exercises

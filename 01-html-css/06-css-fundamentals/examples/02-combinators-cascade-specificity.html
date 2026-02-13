@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combinators, Cascade, and Specificity</title>
+    <style>
+        /* ============================================================
+           PART 1 — CSS COMBINATORS
+           Combinators let you target elements based on their
+           relationship to OTHER elements in the HTML tree.
+           Think of them as "arrows" that describe how two
+           selectors are connected.
+           ============================================================ */
+
+        /*
+         * DESCENDANT COMBINATOR (space)
+         * Syntax:  A B
+         * Meaning: Select every B that is ANYWHERE inside A,
+         *          no matter how deeply nested.
+         *
+         * Here we say: "find every <strong> that lives inside
+         * an element with class="article", even if it's wrapped
+         * in other tags."
+         */
+        .article strong { color: #501cb9; }
+
+        /*
+         * CHILD COMBINATOR (>)
+         * Syntax:  A > B
+         * Meaning: Select every B that is a DIRECT child of A.
+         *          Unlike the descendant combinator, this does NOT
+         *          reach into deeper nesting levels.
+         *
+         * Here we say: "only the <li> elements that are immediate
+         * children of .list get extra bottom margin."
+         * If an <li> were nested inside another <li>, it would NOT match.
+         */
+        .list > li { margin-bottom: 100px; }
+
+        /*
+         * ADJACENT SIBLING COMBINATOR (+)
+         * Syntax:  A + B
+         * Meaning: Select the FIRST B that comes immediately after A,
+         *          and both share the same parent.
+         *
+         * Here: only the very first <p> right after an <h2> gets a
+         * blue background. The second <p> is ignored because it is
+         * not directly adjacent to the <h2>.
+         */
+        h2 + p { background: #ffeff8; padding: 8px; }
+
+        /*
+         * GENERAL SIBLING COMBINATOR (~)
+         * Syntax:  A ~ B
+         * Meaning: Select ALL B elements that come after A and
+         *          share the same parent.  Unlike "+", this grabs
+         *          every matching sibling, not just the first one.
+         *
+         * Here: every <p> that follows an <h3> (under the same
+         * parent) gets dark-slate text color.
+         */
+        h3 ~ p { color: #334155; }
+
+
+        /* ============================================================
+           PART 2 — THE CASCADE AND SPECIFICITY
+           When multiple CSS rules apply to the same element,
+           the browser needs a way to decide which one wins.
+           It uses a scoring system called "specificity":
+
+           Specificity ranking (lowest → highest):
+             1. Type selectors        — e.g. p, h1, div        (0,0,1)
+             2. Class selectors       — e.g. .note, .btn       (0,1,0)
+             3. ID selectors          — e.g. #special-note     (1,0,0)
+             4. Inline styles         — style="..." on the tag
+             5. !important            — overrides everything
+
+           When two rules have EQUAL specificity, the one that
+           appears LATER in the stylesheet wins (that's the
+           "cascade" part — rules cascade downward).
+           ============================================================ */
+
+        /* TYPE selector — specificity (0,0,1)
+         * This is the weakest selector. It matches every <p>. */
+        p { color: #334155; }
+
+        /* CLASS selector — specificity (0,1,0)
+         * Beats the type selector above, so any <p class="note">
+         * will be teal instead of slate. */
+        .note { color: #760f54; }
+
+        /* ID selector — specificity (1,0,0)
+         * Beats both type AND class selectors.
+         * The <p> with id="special-note" turns purple even though
+         * it also has class="note". */
+        #special-note { color: #ed3a3a; }
+
+        /* !important — the nuclear option
+         * This flag overrides normal specificity rules entirely.
+         * Use it sparingly! In large projects, overusing !important
+         * makes CSS very hard to maintain and debug. */
+        .force-red { color: #dc2626 !important; }
+    </style>
+</head>
+<body>
+
+    <!-- ========== DESCENDANT COMBINATOR DEMO ========== -->
+    <!-- The rule ".article strong" makes the <strong> tag red.
+         The <strong> is nested inside <p>, which is inside <article>.
+         The descendant combinator doesn't care how deep — it still matches. -->
+    <article class="article">
+        <h1>Combinators and Cascade</h1>
+        <p>This is a <strong>highlighted</strong> word.</p>
+    </article>
+
+    <!-- ========== ADJACENT SIBLING COMBINATOR DEMO ========== -->
+    <!-- "h2 + p" only selects the FIRST <p> immediately after <h2>.
+         Open this file in a browser and notice:
+           • The 1st paragraph gets a light-blue background ✔
+           • The 2nd paragraph does NOT — it's not directly after <h2> -->
+    <h2>Adjacent sibling example</h2>
+    <p>Selected by h2 + p (I get the blue background!)</p>
+    <p>Not selected by h2 + p (I look normal)</p>
+
+    <!-- ========== GENERAL SIBLING COMBINATOR DEMO ========== -->
+    <!-- "h3 ~ p" selects ALL <p> elements after <h3> that share
+         the same parent.  Both paragraphs below will match. -->
+    <h3>General sibling example</h3>
+    <p>Paragraph 1 after h3 (selected)</p>
+    <p>Paragraph 2 after h3 (also selected)</p>
+
+    <!-- ========== CHILD COMBINATOR DEMO ========== -->
+    <!-- ".list > li" targets only DIRECT child <li> elements.
+         Both <li> below are direct children of <ul class="list">,
+         so they both get extra bottom margin. -->
+    <ul class="list">
+        <li>Direct child A</li>
+        <li>Direct child B</li>
+    </ul>
+
+    <!-- ========== SPECIFICITY DEMO ========== -->
+    <!-- This <p> has class="note" AND id="special-note".
+         Three rules compete:
+           p           → slate color   (specificity 0,0,1)
+           .note       → teal color    (specificity 0,1,0)
+           #special-note → purple color (specificity 1,0,0)
+         Purple wins because the ID selector has the highest specificity. -->
+    <p class="note" id="special-note">ID wins over class and type selector.</p>
+
+    <!-- This <p> also has an ID, but the .force-red class uses !important,
+         which overrides even the ID selector.  The text turns red. -->
+    <p class="note force-red" id="another-note">!important wins this color rule.</p>
+
+</body>
+</html>

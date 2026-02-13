@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 页面字符编码 -->
+    <meta charset="UTF-8">
+    <!-- 移动端视口设置 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selectors and Pseudo Selectors</title>
+
+    <style>
+        /*
+            ==============================
+            选择器总览（新手先看这里）
+            ==============================
+            1) Type selector:      h1
+            2) Class selector:     .card
+            3) ID selector:        #hero-title
+            4) Attribute selector: input[type="text"]
+            5) Pseudo-class:       :hover, :focus, :first-child, :nth-child, :not
+            6) Pseudo-element:     ::before, ::first-line, ::placeholder
+
+            记忆：
+            - " : "  是状态（伪类）
+            - " :: " 是虚拟子内容/子部分（伪元素）
+        */
+
+        /*
+            Type selector（类型选择器）
+            匹配所有 <h1>。
+        */
+        h1 {
+            color: #d8711d;
+        }
+
+        /*
+            Class selector（类选择器）
+            匹配所有 class="card" 的元素。
+            class 可复用，适合“多个同类模块”。
+        */
+        .card {
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        /*
+            ID selector（ID 选择器）
+            匹配 id="hero-title" 的元素。
+            一般一个页面里同一个 id 只用一次。
+        */
+        #hero-title {
+            text-transform: lowercase;
+            letter-spacing: 10px;
+        }
+
+        /*
+            Attribute selector（属性选择器）
+            input[type="text"]
+            含义：选择所有 type="text" 的 input。
+            如果页面有多个文本输入框，它们都会命中这里。
+        */
+        input[type="text"] {
+            border: 2px solid #fa6060;
+            padding: 6px;
+        }
+
+        /*
+            a[href^="https"]
+            ^= 表示“属性值以某字符串开头”。
+            这里选中所有 https 开头的链接。
+        */
+        a[href^="https"] {
+            color: #059669;
+        }
+
+        /*
+            Pseudo-class（伪类）:hover
+            鼠标移上去时生效。
+        */
+        .btn:hover {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        /*
+            Pseudo-class（伪类）:focus
+            键盘 Tab 到按钮时生效。
+            可访问性里非常重要：让焦点可见。
+        */
+        .btn:focus {
+            outline: 3px solid #fd93da;
+            outline-offset: 2px;
+        }
+
+        /*
+            Structural pseudo-class（结构伪类）
+            first-child: 匹配父元素的第一个子元素。
+        */
+        ul li:first-child {
+            font-weight: bold;
+        }
+
+        /*
+            nth-child(2): 匹配父元素下第 2 个子元素。
+            计数从 1 开始，不是从 0。
+        */
+        ul li:nth-child(2) {
+            color: #7c3aed;
+        }
+
+        /*
+            :not(.skip): 排除 class="skip" 的项。
+            所以除了 .skip，其他 li 都会加左边线。
+        */
+        ul li:not(.skip) {
+            border-left: 3px solid #bfdbfe;
+            padding-left: 6px;
+        }
+
+        /*
+            Pseudo-element（伪元素）::before
+            在 .tag 元素内容前插入文字。
+        */
+        .tag::before {
+            content: "what!!! ";
+            color: #64748b;
+        }
+
+        /*
+            ::first-line
+            只影响段落第一行（行数会随窗口宽度变化）。
+        */
+        .intro::first-line {
+            font-weight: bold;
+        }
+
+        /*
+            ::placeholder
+            设置输入框 placeholder 文本样式。
+        */
+        input::placeholder {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <!-- h1 同时命中 h1 规则和 #hero-title 规则 -->
+    <h1 id="hero-title">CSS Selectors Demo</h1>
+
+    <!-- 这里用于演示 ::first-line -->
+    <p class="intro">This paragraph demonstrates ::first-line. Resize to see how first line changes.</p>
+
+    <div class="card">
+        <!-- 这里用于演示 .tag::before -->
+        <p class="tag">Selectors</p>
+        <p>Type, class, id, and attribute selectors are the foundation.</p>
+    </div>
+
+    <div class="card">
+        <label for="name">Name</label><br>
+        <!-- 这里用于演示 input[type="text"] 和 ::placeholder -->
+        <input id="name" type="text" placeholder="Type your name">
+    </div>
+
+    <!-- 这里用于演示 a[href^="https"] -->
+    <a href="https://developer.mozilla.org">HTTPS link</a>
+    <br><br>
+
+    <!-- 这里用于演示 :hover 和 :focus -->
+    <button class="btn" type="button">Hover or Focus me</button>
+
+    <!-- 这里用于演示 :first-child / :nth-child / :not -->
+    <ul>
+        <li>First item</li>
+        <li>Second item</li>
+        <li class="skip">Third item (skipped by :not)</li>
+    </ul>
+</body>
+</html>

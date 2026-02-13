@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid Basics</title>
+    <style>
+        /* ============================================================
+           CSS Grid 网格布局
+
+           Grid 是一种二维布局方式（同时处理行和列）。
+           Flexbox 擅长一维（一行或一列），Grid 擅长二维（行 + 列）。
+
+           术语：
+             Grid 容器 (container)  — 设了 display: grid 的元素
+             Grid 项目 (item)       — 容器的直接子元素
+             Grid 线 (line)         — 划分行列的线，从 1 开始编号
+             Grid 轨道 (track)      — 两条线之间的空间（即一行或一列）
+             Grid 单元格 (cell)     — 行和列交叉形成的最小区域
+             Grid 区域 (area)       — 一个或多个单元格组成的矩形区域
+
+           网格线编号示意（3列的情况）：
+             列线:  1    2    3    4
+                    |    |    |    |
+                    | C1 | C2 | C3 |
+           ============================================================ */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h3 { margin-bottom: 4px; color: #334155; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+
+        /* 通用的 grid 演示容器 */
+        .grid-demo {
+            display: grid;
+            background: #f1f5f9;
+            border: 2px dashed #94a3b8;
+            padding: 8px;
+            margin: 10px 0 24px;
+            gap: 8px;
+        }
+
+        /* 通用的 grid 子元素 */
+        .grid-demo > div {
+            background: #bfdbfe;
+            border: 2px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* 颜色区分 */
+        .g-red    { background: #fecaca !important; border-color: #ef4444 !important; }
+        .g-green  { background: #bbf7d0 !important; border-color: #22c55e !important; }
+        .g-purple { background: #e9d5ff !important; border-color: #a855f7 !important; }
+        .g-yellow { background: #fef3c7 !important; border-color: #f59e0b !important; }
+        .g-pink   { background: #fce7f3 !important; border-color: #ec4899 !important; }
+        .g-cyan   { background: #cffafe !important; border-color: #06b6d4 !important; }
+
+
+        /* ============================================================
+           grid-template-columns / grid-template-rows
+           定义网格的列数、列宽 / 行数、行高
+
+           写法：每个值代表一条轨道的大小
+             grid-template-columns: 100px 200px 100px;  → 三列
+             grid-template-rows: 50px 80px;             → 两行
+
+           fr 单位 (fraction)：
+             剩余空间的份数，类似 flex-grow。
+             1fr 2fr 1fr → 第二列占两份，其余各一份
+           ============================================================ */
+        .grid-fixed {
+            grid-template-columns: 100px 200px 100px;
+        }
+
+        .grid-fr {
+            grid-template-columns: 1fr 2fr 1fr;
+        }
+
+        .grid-mixed {
+            grid-template-columns: 200px 1fr 1fr;
+        }
+
+
+        /* ============================================================
+           repeat() — 重复定义轨道
+
+           repeat(3, 1fr)   → 等价于 1fr 1fr 1fr
+           repeat(2, 100px 1fr) → 等价于 100px 1fr 100px 1fr
+
+           减少重复代码，更简洁。
+           ============================================================ */
+        .grid-repeat {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+
+        /* ============================================================
+           minmax() — 设置轨道的最小和最大尺寸
+
+           minmax(100px, 1fr) → 最小 100px，最大占满剩余空间
+           minmax(200px, 300px) → 最小 200px，最大 300px
+
+           常和 auto-fit / auto-fill 配合做响应式网格。
+           ============================================================ */
+        .grid-minmax {
+            grid-template-columns: repeat(3, minmax(100px, 1fr));
+        }
+
+
+        /* ============================================================
+           auto-fit vs auto-fill — 自动列数
+
+           都用在 repeat() 中，让浏览器自动决定列数。
+
+           auto-fill：尽可能多地创建列，即使是空列
+           auto-fit ：尽可能多地创建列，但空列会被折叠为 0 宽度，
+                      剩余空间分给已有的列
+
+           配合 minmax() 可以做出完美的响应式卡片网格：
+             repeat(auto-fit, minmax(150px, 1fr))
+             → 每列至少 150px，放得下就多列，放不下就少列
+           ============================================================ */
+        .grid-autofit {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .grid-autofill {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+
+        /* ============================================================
+           gap — 网格间距
+
+           gap: 16px;           → 行列间距都是 16px
+           gap: 10px 20px;      → 行间距 10px，列间距 20px
+           row-gap / column-gap → 单独设置
+           ============================================================ */
+        .grid-gap {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px 24px;  /* 行间距 12px，列间距 24px */
+        }
+
+
+        /* ============================================================
+           grid-column / grid-row — 项目跨越多个轨道
+
+           通过网格线编号指定项目的起止位置：
+             grid-column: 1 / 3;  → 从列线 1 到列线 3（跨 2 列）
+             grid-row: 1 / 3;     → 从行线 1 到行线 3（跨 2 行）
+
+           也可以用 span 关键字：
+             grid-column: span 2; → 跨 2 列（不指定起点，自动排）
+           ============================================================ */
+        .grid-span {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto auto;
+        }
+        .span-2-col { grid-column: span 2; }
+        .span-full  { grid-column: 1 / -1; }  /* -1 表示最后一条线 */
+        .span-2-row { grid-row: span 2; }
+
+
+        /* ============================================================
+           grid-template-areas — 给网格区域命名
+
+           用字符串"画"出布局，直观易读。
+           每个字符串代表一行，每个名字代表一个区域。
+           用 "." 表示空白区域。
+
+           然后子元素用 grid-area: 名字; 来放到对应位置。
+           ============================================================ */
+        .grid-areas {
+            grid-template-columns: 200px 1fr 1fr;
+            grid-template-rows: 50px 1fr 40px;
+            grid-template-areas:
+                "header  header  header"
+                "sidebar content content"
+                "footer  footer  footer";
+            min-height: 300px;
+        }
+        .area-header  { grid-area: header;  background: #bfdbfe !important; }
+        .area-sidebar { grid-area: sidebar; background: #bbf7d0 !important; }
+        .area-content { grid-area: content; background: #fef3c7 !important; }
+        .area-footer  { grid-area: footer;  background: #e9d5ff !important; }
+
+
+        /* ============================================================
+           justify-items / align-items — 单元格内的对齐
+
+           justify-items → 水平方向（行轴）上单元格内的对齐
+           align-items   → 垂直方向（列轴）上单元格内的对齐
+
+           可选值：start | end | center | stretch（默认）
+
+           justify-self / align-self → 覆盖单个项目的对齐
+           ============================================================ */
+        .grid-align {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: 100px;
+            justify-items: center;
+            align-items: center;
+        }
+        .self-start { justify-self: start; align-self: start; }
+        .self-end   { justify-self: end; align-self: end; }
+    </style>
+</head>
+<body>
+    <h1>CSS Grid Basics（网格布局基础）</h1>
+
+    <!-- ========== grid-template-columns 演示 ========== -->
+    <h2>grid-template-columns（定义列）</h2>
+
+    <!-- 固定像素值：三列分别是 100px、200px、100px -->
+    <h3><code>grid-template-columns: 100px 200px 100px</code></h3>
+    <div class="grid-demo grid-fixed">
+        <div>100px</div>
+        <div class="g-green">200px</div>
+        <div class="g-purple">100px</div>
+    </div>
+
+    <!-- fr 单位：按比例分配。1:2:1 表示中间列占一半 -->
+    <h3><code>grid-template-columns: 1fr 2fr 1fr</code>（fr 单位，按比例分配）</h3>
+    <div class="grid-demo grid-fr">
+        <div>1fr</div>
+        <div class="g-green">2fr（占两份）</div>
+        <div class="g-purple">1fr</div>
+    </div>
+
+    <!-- 混合使用：第一列固定 200px，其余两列平分剩余空间 -->
+    <h3><code>grid-template-columns: 200px 1fr 1fr</code>（固定 + 弹性混合）</h3>
+    <div class="grid-demo grid-mixed">
+        <div class="g-yellow">200px 固定</div>
+        <div class="g-green">1fr 弹性</div>
+        <div class="g-purple">1fr 弹性</div>
+    </div>
+
+    <!-- ========== repeat() 演示 ========== -->
+    <h2>repeat()（重复函数）</h2>
+
+    <h3><code>repeat(4, 1fr)</code> → 四列等宽</h3>
+    <div class="grid-demo grid-repeat">
+        <div>1</div><div class="g-green">2</div>
+        <div class="g-purple">3</div><div class="g-yellow">4</div>
+    </div>
+
+    <!-- ========== minmax() 演示 ========== -->
+    <h2>minmax()（最小最大值）</h2>
+
+    <!-- 每列最小 100px，最大 1fr。拖动窗口变窄，列不会小于 100px -->
+    <h3><code>repeat(3, minmax(100px, 1fr))</code></h3>
+    <div class="grid-demo grid-minmax">
+        <div>min:100px</div><div class="g-green">max:1fr</div><div class="g-purple">自适应</div>
+    </div>
+
+    <!-- ========== auto-fit vs auto-fill 演示 ========== -->
+    <!-- 拖动浏览器窗口查看差异：
+         auto-fit 会让现有项目扩展填满剩余空间
+         auto-fill 会保留空列（不扩展现有项目） -->
+    <h2>auto-fit vs auto-fill（响应式列数）</h2>
+
+    <h3><code>repeat(auto-fit, minmax(150px, 1fr))</code>（常用！拖动窗口试试）</h3>
+    <div class="grid-demo grid-autofit">
+        <div class="g-green">A</div><div class="g-purple">B</div><div class="g-yellow">C</div>
+    </div>
+
+    <h3><code>repeat(auto-fill, minmax(150px, 1fr))</code>（对比 auto-fit）</h3>
+    <div class="grid-demo grid-autofill">
+        <div class="g-green">A</div><div class="g-purple">B</div><div class="g-yellow">C</div>
+    </div>
+
+    <!-- ========== gap 演示 ========== -->
+    <h2>gap（网格间距）</h2>
+
+    <h3><code>gap: 12px 24px</code>（行间距 12px，列间距 24px）</h3>
+    <div class="grid-demo grid-gap">
+        <div>1</div><div class="g-green">2</div><div class="g-purple">3</div>
+        <div class="g-yellow">4</div><div class="g-pink">5</div><div class="g-cyan">6</div>
+    </div>
+
+    <!-- ========== grid-column / grid-row 跨越演示 ========== -->
+    <!-- 通过网格线编号或 span 让项目占据多个单元格。
+         grid-column: 1 / -1 表示从第一条线到最后一条线（横跨所有列）。 -->
+    <h2>grid-column / grid-row（跨越轨道）</h2>
+
+    <h3>span 跨列 / 跨行</h3>
+    <div class="grid-demo grid-span">
+        <div class="span-2-col g-green">span 2 列</div>
+        <div class="g-purple">1 列</div>
+        <div class="g-yellow">1 列</div>
+        <div class="span-2-row g-pink">span<br>2<br>行</div>
+        <div>1×1</div>
+        <div class="g-cyan">1×1</div>
+        <div class="span-full g-red">grid-column: 1 / -1（横跨所有列）</div>
+    </div>
+
+    <!-- ========== grid-template-areas 演示 ========== -->
+    <!-- 用字符串"画"出布局，每个名字对应一个区域。
+         这是 Grid 最直观的布局方式。 -->
+    <h2>grid-template-areas（命名区域）</h2>
+
+    <h3>经典三栏布局（header / sidebar + content / footer）</h3>
+    <div class="grid-demo grid-areas">
+        <div class="area-header">Header</div>
+        <div class="area-sidebar">Sidebar</div>
+        <div class="area-content">Content</div>
+        <div class="area-footer">Footer</div>
+    </div>
+
+    <!-- ========== justify-items / align-items 演示 ========== -->
+    <!-- 控制项目在单元格内部的对齐方式。
+         justify-self / align-self 可以覆盖个别项目。 -->
+    <h2>justify-items / align-items（单元格内对齐）</h2>
+
+    <h3><code>justify-items: center; align-items: center</code>，个别项目覆盖</h3>
+    <div class="grid-demo grid-align">
+        <div class="self-start g-green">start/start</div>
+        <div class="g-purple">center/center（默认）</div>
+        <div class="self-end g-red">end/end</div>
+    </div>
+</body>
+</html>

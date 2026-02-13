@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox Items</title>
+    <style>
+        /* ============================================================
+           Flexbox 弹性盒布局 — 项目属性 (Item Properties)
+
+           上一个文件讲的是容器 (container) 的属性，
+           本文件讲的是项目 (item) 的属性——即容器的直接子元素。
+
+           项目属性可以覆盖容器的对齐设置，也可以控制
+           项目如何分配和占据可用空间。
+
+           核心属性：
+             flex-grow   — 有多余空间时，项目按什么比例扩展
+             flex-shrink — 空间不足时，项目按什么比例收缩
+             flex-basis  — 在分配多余空间之前，项目的初始大小
+             flex        — 以上三者的简写（推荐使用）
+             align-self  — 覆盖容器的 align-items，单独控制某个项目的交叉轴对齐
+             order       — 改变项目的视觉排列顺序（不影响 DOM 顺序）
+           ============================================================ */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .flex-demo {
+            display: flex;
+            background: #f1f5f9;
+            border: 2px dashed #94a3b8;
+            padding: 8px;
+            margin: 10px 0 24px;
+            min-height: 60px;
+        }
+        .flex-demo > div {
+            background: #bfdbfe;
+            border: 2px solid #3b82f6;
+            padding: 12px 16px;
+            margin: 4px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        h3 { margin-bottom: 4px; color: #334155; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+
+
+        /* ============================================================
+           flex-grow — 扩展比例
+
+           默认值为 0（不扩展）。
+           当容器有多余空间时，flex-grow 决定每个项目
+           "吃掉"多少多余空间。
+
+           计算方式：
+             多余空间 = 容器宽度 - 所有项目的 flex-basis 之和
+             每个项目分到的多余空间 = 多余空间 × (自己的 grow / 所有 grow 之和)
+
+           例子：三个项目的 flex-grow 分别是 1, 2, 1
+             总 grow = 1+2+1 = 4
+             第二个项目分到 2/4 = 50% 的多余空间
+           ============================================================ */
+        .grow-0 { flex-grow: 0; }   /* 不扩展（默认） */
+        .grow-1 { flex-grow: 1; }   /* 按比例 1 扩展 */
+        .grow-2 { flex-grow: 2; }   /* 按比例 2 扩展，拿到双倍的多余空间 */
+
+
+        /* ============================================================
+           flex-shrink — 收缩比例
+
+           默认值为 1（等比收缩）。
+           当容器空间不足时，flex-shrink 决定每个项目
+           "让出"多少空间。
+
+           flex-shrink: 0 → 不收缩，保持原始大小
+           flex-shrink: 2 → 收缩速度是其他项目的两倍
+           ============================================================ */
+        .shrink-demo > div {
+            width: 250px;   /* 总宽远超容器，触发收缩 */
+        }
+        .shrink-0 { flex-shrink: 0; }  /* 不收缩 */
+        .shrink-1 { flex-shrink: 1; }  /* 正常收缩（默认） */
+        .shrink-3 { flex-shrink: 3; }  /* 收缩更快 */
+
+
+        /* ============================================================
+           flex-basis — 初始大小
+
+           在分配多余空间（grow）或收缩空间（shrink）之前，
+           项目的基准大小。
+
+           flex-basis: auto（默认）→ 和 width 相同（或由内容撑开）
+           flex-basis: 0           → 完全由 flex-grow 决定大小
+           flex-basis: 200px       → 初始宽度 200px
+
+           flex-basis 优先级高于 width！
+           如果同时设了 width: 100px 和 flex-basis: 200px，
+           项目的初始大小是 200px。
+           ============================================================ */
+        .basis-auto { flex-basis: auto; }
+        .basis-0    { flex-basis: 0; }
+        .basis-200  { flex-basis: 200px; }
+
+
+        /* ============================================================
+           flex 简写 — 推荐写法
+
+           flex 是 flex-grow、flex-shrink、flex-basis 的简写。
+           常用值：
+
+           flex: 0 1 auto   → 默认值（不扩展，可收缩，按内容大小）
+           flex: 1          → 等价于 flex: 1 1 0（等分空间）
+           flex: auto       → 等价于 flex: 1 1 auto（扩展 + 按内容）
+           flex: none       → 等价于 flex: 0 0 auto（不伸不缩）
+           flex: 2          → 等价于 flex: 2 1 0（拿两倍空间）
+
+           推荐用 flex 简写，而不是分别写三个属性。
+           ============================================================ */
+        .flex-1    { flex: 1; }     /* 最常用：等分空间 */
+        .flex-2    { flex: 2; }     /* 拿双倍空间 */
+        .flex-none { flex: none; }  /* 完全不伸缩 */
+        .flex-auto { flex: auto; }  /* 按内容扩展 */
+
+
+        /* ============================================================
+           align-self — 单个项目的交叉轴对齐
+
+           覆盖容器的 align-items，只对当前项目生效。
+           可选值和 align-items 一样：
+             auto | flex-start | flex-end | center | baseline | stretch
+           ============================================================ */
+        .as-container {
+            align-items: flex-start;   /* 容器默认靠顶部 */
+            min-height: 120px;
+        }
+        .as-center  { align-self: center; }
+        .as-end     { align-self: flex-end; }
+        .as-stretch { align-self: stretch; }
+
+
+        /* ============================================================
+           order — 视觉排列顺序
+
+           默认所有项目的 order 为 0。
+           数值越小越靠前，可以用负数。
+           注意：order 只改变视觉顺序，不影响 DOM 顺序，
+                 屏幕阅读器和 Tab 导航仍然按 DOM 顺序。
+           ============================================================ */
+        .order-3  { order: 3; }
+        .order-1  { order: 1; }
+        .order-neg1 { order: -1; }
+
+        /* 用颜色区分各个项目 */
+        .item-red    { background: #fecaca !important; border-color: #ef4444 !important; }
+        .item-green  { background: #bbf7d0 !important; border-color: #22c55e !important; }
+        .item-purple { background: #e9d5ff !important; border-color: #a855f7 !important; }
+        .item-yellow { background: #fef3c7 !important; border-color: #f59e0b !important; }
+    </style>
+</head>
+<body>
+    <h1>Flexbox Item Properties（Flex 项目属性）</h1>
+
+    <!-- ========== flex-grow 演示 ========== -->
+    <!-- 容器宽度有多余空间时，flex-grow 控制每个项目如何瓜分。
+         下面的例子中：A 不扩展，B 拿到 2 份多余空间，C 拿到 1 份。
+         所以 B 比 C 宽一些。 -->
+    <h2>flex-grow（扩展比例）</h2>
+
+    <h3>全部 <code>flex-grow: 0</code>（默认，不扩展）</h3>
+    <div class="flex-demo">
+        <div class="grow-0">grow:0</div>
+        <div class="grow-0">grow:0</div>
+        <div class="grow-0">grow:0</div>
+    </div>
+
+    <h3>全部 <code>flex-grow: 1</code>（等分多余空间）</h3>
+    <div class="flex-demo">
+        <div class="grow-1">grow:1</div>
+        <div class="grow-1">grow:1</div>
+        <div class="grow-1">grow:1</div>
+    </div>
+
+    <h3><code>flex-grow: 1, 2, 1</code>（中间拿双倍）</h3>
+    <div class="flex-demo">
+        <div class="grow-1 item-red">grow:1</div>
+        <div class="grow-2 item-green">grow:2（我更宽）</div>
+        <div class="grow-1 item-purple">grow:1</div>
+    </div>
+
+    <!-- ========== flex-shrink 演示 ========== -->
+    <!-- 三个项目各自 width: 250px，总宽 750px 超过了容器。
+         flex-shrink 控制谁"让出"更多空间。
+         shrink:0 的项目保持 250px 不收缩，shrink:3 的收缩最多。 -->
+    <h2>flex-shrink（收缩比例）</h2>
+
+    <h3><code>flex-shrink: 0, 1, 3</code>（第一个不收缩，第三个收缩最快）</h3>
+    <div class="flex-demo shrink-demo">
+        <div class="shrink-0 item-red">shrink:0（不缩）</div>
+        <div class="shrink-1 item-green">shrink:1</div>
+        <div class="shrink-3 item-purple">shrink:3（缩最多）</div>
+    </div>
+
+    <!-- ========== flex-basis 演示 ========== -->
+    <!-- flex-basis 决定"初始大小"，在 grow/shrink 之前的基准值。 -->
+    <h2>flex-basis（初始大小）</h2>
+
+    <h3><code>flex-basis: auto</code> vs <code>200px</code> vs <code>0</code></h3>
+    <div class="flex-demo">
+        <div class="basis-auto grow-1 item-red">basis:auto + grow:1</div>
+        <div class="basis-200 grow-1 item-green">basis:200px + grow:1</div>
+        <div class="basis-0 grow-1 item-purple">basis:0 + grow:1</div>
+    </div>
+
+    <!-- ========== flex 简写演示 ========== -->
+    <!-- 实际项目中，推荐直接用 flex 简写，简洁清晰。 -->
+    <h2>flex 简写（推荐写法）</h2>
+
+    <h3><code>flex: 1</code> — 三个项目等分空间</h3>
+    <div class="flex-demo">
+        <div class="flex-1">flex:1</div>
+        <div class="flex-1">flex:1</div>
+        <div class="flex-1">flex:1</div>
+    </div>
+
+    <h3><code>flex: 1</code> + <code>flex: 2</code> — 中间占双倍</h3>
+    <div class="flex-demo">
+        <div class="flex-1 item-red">flex:1</div>
+        <div class="flex-2 item-green">flex:2</div>
+        <div class="flex-1 item-purple">flex:1</div>
+    </div>
+
+    <h3><code>flex: none</code> vs <code>flex: auto</code></h3>
+    <div class="flex-demo">
+        <div class="flex-none item-red">flex:none（不伸缩）</div>
+        <div class="flex-auto item-green">flex:auto（按内容扩展，我的文字比较多所以我更宽）</div>
+        <div class="flex-1 item-purple">flex:1</div>
+    </div>
+
+    <!-- ========== align-self 演示 ========== -->
+    <!-- 容器设了 align-items: flex-start（靠顶部），
+         但个别项目可以用 align-self 覆盖这个设置。 -->
+    <h2>align-self（单个项目的交叉轴对齐）</h2>
+
+    <h3>容器 <code>align-items: flex-start</code>，但个别项目覆盖</h3>
+    <div class="flex-demo as-container">
+        <div>默认 (flex-start)</div>
+        <div class="as-center item-green">align-self: center</div>
+        <div class="as-end item-red">align-self: flex-end</div>
+        <div class="as-stretch item-purple">align-self: stretch</div>
+    </div>
+
+    <!-- ========== order 演示 ========== -->
+    <!-- DOM 顺序是 A → B → C → D，但 order 改变了视觉顺序。
+         order 越小越靠前，默认值为 0。
+         D 的 order 是 -1，所以排到最前面。 -->
+    <h2>order（视觉排列顺序）</h2>
+
+    <h3>DOM 顺序: A→B→C→D，但 order 改变了视觉位置</h3>
+    <div class="flex-demo">
+        <div class="order-3 item-red">A (order:3)</div>
+        <div class="order-1 item-green">B (order:1)</div>
+        <div class="item-purple">C (order:0 默认)</div>
+        <div class="order-neg1 item-yellow">D (order:-1)</div>
+    </div>
+    <p style="color:#64748b; font-size:14px;">
+        视觉顺序变成：D(-1) → C(0) → B(1) → A(3)<br>
+        注意：order 只改变视觉顺序，不影响 Tab 键导航和屏幕阅读器。
+    </p>
+</body>
+</html>

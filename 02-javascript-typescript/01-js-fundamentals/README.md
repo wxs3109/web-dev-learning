@@ -23,6 +23,15 @@ JavaScript is a dynamically typed, interpreted language that forms the foundatio
 ## Prerequisites
 - Complete 01-html-css modules 01-08 (HTML fundamentals through responsive design)
 
+## Examples
+
+| File | Concepts |
+| --- | --- |
+| [01-variables-and-types.js](examples/01-variables-and-types.js) | `var`/`let`/`const` differences, 7 primitive types, `typeof` operator, type checking gotchas, value vs reference |
+| [02-operators-and-coercion.js](examples/02-operators-and-coercion.js) | arithmetic, comparison (`==` vs `===`), logical, assignment operators, implicit/explicit coercion, truthy/falsy |
+| [03-control-flow.js](examples/03-control-flow.js) | `if`/`else if`/`else`, ternary operator, `switch`, `for`, `while`/`do...while`, `for...of`, `break`/`continue` |
+| [04-modern-syntax.js](examples/04-modern-syntax.js) | template literals, nullish coalescing (`??`), optional chaining (`?.`), short-circuit patterns |
+
 ## Resources
 - TODO: Add resources
 

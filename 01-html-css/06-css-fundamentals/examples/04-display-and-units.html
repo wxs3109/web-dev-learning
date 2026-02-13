@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display and Units</title>
+    <style>
+        /* ============================================================
+           PART 1 — display 属性
+           每个 HTML 元素都有一个默认的 display 值，它决定了元素
+           在页面上如何排列。最常见的四种：
+
+           block        — 独占一行，可以设 width/height/margin/padding
+           inline       — 和文字一样排在同一行，不能设 width/height
+           inline-block — 排在同一行，但可以设 width/height（两者的结合）
+           none         — 完全隐藏，不占空间
+
+           常见默认值：
+             block  元素：<div>, <p>, <h1>-<h6>, <ul>, <li>, <section> …
+             inline 元素：<span>, <a>, <strong>, <em>, <img>(特殊) …
+           ============================================================ */
+
+        /* 根元素字体大小设为 16px，后面 rem 单位会以此为基准 */
+        html { font-size: 16px; }
+
+        /*
+         * display: block
+         * <span> 本来是 inline 元素（和文字排在同一行），
+         * 但我们强制改成 block，于是每个 <span> 都独占一行，
+         * 就像 <div> 一样。
+         */
+        .block-example span {
+            display: block;
+            background: #eef2ff;
+            margin-bottom: 6px;
+        }
+
+        /*
+         * display: inline
+         * <div> 本来是 block 元素（独占一行），
+         * 但我们强制改成 inline，于是两个 <div> 挤在同一行。
+         * 注意：inline 元素的 width 和 height 设置会被忽略！
+         */
+        .inline-example div {
+            display: inline;
+            background: #fef3c7;
+        }
+
+        /*
+         * display: inline-block
+         * 结合了 inline 和 block 的优点：
+         *   - 像 inline 一样排在同一行
+         *   - 像 block 一样可以设 width、height、padding
+         * 非常适合做横向排列的卡片、按钮等。
+         */
+        .inline-block-example span {
+            display: inline-block;
+            width: 120px;
+            padding: 8px;
+            background: #dcfce7;
+            margin-right: 6px;
+        }
+
+        /*
+         * display: none
+         * 元素完全消失，不占任何空间，也不会被屏幕阅读器读到。
+         * 跟 visibility: hidden 的区别：
+         *   none   → 不占空间（后面的元素会顶上来）
+         *   hidden → 仍然占空间（只是看不见）
+         */
+        .hidden-example { display: none; }
+
+
+        /* ============================================================
+           PART 2 — CSS 单位 (Units)
+           CSS 中有两大类单位：
+
+           绝对单位（固定大小，不随环境变化）：
+             px  — 像素，最常用的绝对单位
+
+           相对单位（大小取决于某个参照物）：
+             %   — 相对于父元素的对应属性
+             em  — 相对于当前元素的 font-size（会层层叠加！）
+             rem — 相对于根元素 <html> 的 font-size（不会叠加，更可控）
+             vw  — 视口宽度的 1%（viewport width）
+             vh  — 视口高度的 1%（viewport height）
+             ch  — 字符 "0" 的宽度（适合控制文本列宽）
+
+           什么时候用哪个？
+             - 字体大小：推荐 rem（全局一致）或 em（组件内相对缩放）
+             - 宽度/布局：% 或 vw 做响应式，px 做固定尺寸
+             - 间距：rem 或 px
+           ============================================================ */
+
+        /* px — 绝对单位，不管屏幕多大，宽度永远是 240 像素 */
+        .px-box { width: 240px; background: #e0f2fe; margin: 6px 0; }
+
+        /* % — 父元素宽度的 50%，拖动浏览器窗口试试看，它会跟着变 */
+        .percent-box { width: 50%; background: #fee2e2; margin: 6px 0; }
+
+        /*
+         * em — 相对于父元素的 font-size
+         * 如果父元素是 16px，那 1.25em = 16 × 1.25 = 20px
+         * 注意：em 会"叠加"！如果嵌套多层 1.25em，字会越来越大。
+         */
+        .em-text { font-size: 0.8em; }
+
+        /*
+         * rem — 相对于根元素 <html> 的 font-size（这里 html 设了 16px）
+         * 1.25rem = 16 × 1.25 = 20px
+         * 不管嵌套多深，rem 永远只看 <html> 的值，不会叠加。
+         * 这就是 rem 比 em 更常用的原因。
+         */
+        .rem-text { font-size: 1.25rem; }
+
+        /* vw — 视口宽度的 40%，缩放浏览器窗口可以看到效果 */
+        .vw-box { width: 40vw; background: #ede9fe; margin: 6px 0; }
+
+        /* vh — 视口高度的 20%，注意这里设的是 height，不是 width */
+        .vh-box { height: 20vh; background: #ecfeff; margin: 6px 0; }
+
+        /*
+         * ch — 字符 "0" 的宽度
+         * 30ch ≈ 30 个字符宽，非常适合限制段落宽度，提高可读性。
+         * 实际宽度会随字体不同而变化。
+         */
+        .ch-box { width: 30ch; background: #f0fdf4; margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <h1>Display and CSS Units</h1>
+
+    <!-- ========== display: block 演示 ==========
+         <span> 默认是 inline 元素，本来会排在同一行。
+         但 CSS 把它改成了 block，所以每个 span 独占一行。 -->
+    <h2>display: block</h2>
+    <div class="block-example">
+        <span>Block item A（我本来是 inline，现在变成 block 了）</span>
+        <span>Block item B（我也独占一行）</span>
+    </div>
+
+    <!-- ========== display: inline 演示 ==========
+         <div> 默认是 block 元素，本来会独占一行。
+         但 CSS 把它改成了 inline，所以两个 div 挤在同一行。
+         注意：此时 width/height 设置无效。 -->
+    <h2>display: inline</h2>
+    <div class="inline-example">
+        <div>Inline A（我本来是 block）</div>
+        <div>Inline B（现在和 A 挤在一行了）</div>
+    </div>
+
+    <!-- ========== display: inline-block 演示 ==========
+         两个 span 排在同一行（inline 特性），
+         但各自可以设 width 和 padding（block 特性）。 -->
+    <h2>display: inline-block</h2>
+    <div class="inline-block-example">
+        <span>Inline-block A</span>
+        <span>Inline-block B</span>
+    </div>
+
+    <!-- ========== display: none 演示 ==========
+         这段文字被完全隐藏了，页面上看不到也不占空间。
+         用浏览器开发者工具 (F12) 可以在 DOM 中找到它。 -->
+    <h2>display: none</h2>
+    <p class="hidden-example">You should not see this text.（你不应该看到这段话）</p>
+
+    <!-- ========== CSS 单位演示 ==========
+         试试拖动浏览器窗口大小，观察哪些盒子会跟着变，哪些不会。
+         - px 盒子：固定不动
+         - %、vw 盒子：跟着窗口变化
+         - vh 盒子：高度跟着窗口高度变化 -->
+    <h2>Units（单位）</h2>
+
+    <!-- em vs rem 对比：这里两者看起来一样大 (都是 20px)，
+         但如果嵌套在一个字体放大的父元素里，em 会叠加变大，rem 不会。 -->
+    <p class="em-text">1.25em 文字（相对于父元素字体大小：16 × 1.25 = 20px）</p>
+    <p class="rem-text">1.25rem 文字（相对于根元素字体大小：16 × 1.25 = 20px）</p>
+
+    <div class="px-box">240px 宽（绝对单位，固定不变）</div>
+    <div class="percent-box">50% 宽（父元素宽度的一半，拖动窗口试试）</div>
+    <div class="vw-box">40vw 宽（视口宽度的 40%）</div>
+    <div class="vh-box">20vh 高（视口高度的 20%）</div>
+    <div class="ch-box">30ch 宽（约 30 个字符宽）</div>
+</body>
+</html>
