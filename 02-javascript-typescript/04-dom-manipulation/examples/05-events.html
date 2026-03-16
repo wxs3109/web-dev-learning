@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>05 — 事件处理 (Event Handling)</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    .box { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .result { background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap; font-family: monospace; max-height: 200px; overflow-y: auto; }
+    button { padding: 6px 14px; margin: 4px; cursor: pointer; border: 1px solid #999; border-radius: 3px; background: #fff; }
+    button:hover { background: #eee; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      padding: 6px 10px; border: 1px solid #ccc; border-radius: 3px; margin: 4px; min-width: 200px;
+    }
+
+    /* PART 3: 冒泡/捕获 可视化 */
+    .bubble-outer { background: #ffeaa7; padding: 20px; border-radius: 4px; cursor: pointer; }
+    .bubble-middle { background: #74b9ff; padding: 15px; border-radius: 4px; cursor: pointer; margin-top: 8px; }
+    .bubble-inner { background: #fd79a8; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 8px; text-align: center; font-weight: bold; }
+
+    /* PART 4: 事件委托 */
+    .delegate-list { list-style: none; padding: 0; }
+    .delegate-item { padding: 8px 12px; margin: 4px 0; background: #f8f9fa; border-radius: 3px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e0e0; }
+    .delegate-item:hover { background: #e9ecef; }
+    .delete-btn { background: #ff6b6b; color: white; border: none; border-radius: 3px; padding: 2px 8px; cursor: pointer; font-size: 12px; }
+    .delete-btn:hover { background: #ee5a5a; }
+
+    /* PART 5: 表单验证状态 */
+    .field-valid { border-color: #27ae60 !important; }
+    .field-invalid { border-color: #e74c3c !important; }
+    .field-hint { font-size: 13px; color: #666; margin: 2px 4px; display: block; }
+
+    /* PART 6: 练习题 */
+    .exercise-box { background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px; }
+    .exercise-box h3 { margin: 0 0 8px 0; font-size: 15px; }
+    .answer-block { display: none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; margin-top: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+    .answer-block.visible { display: block; }
+    .todo-list { list-style: none; padding: 0; }
+    .todo-item { padding: 6px 10px; margin: 3px 0; background: #fff; border: 1px solid #ddd; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
+    .todo-delete { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+    05 — 事件处理 (Event Handling)
+
+    在浏览器中打开此文件，点击按钮查看效果。
+    打开 DevTools Console (F12) 查看日志。
+
+    本文件涵盖：
+      1. addEventListener / removeEventListener
+      2. Event 对象（e.target, e.currentTarget, e.preventDefault, e.stopPropagation）
+      3. 事件冒泡与捕获 (Bubbling & Capturing)
+      4. 事件委托 (Event Delegation) — 关键性能模式
+      5. 常见事件类型（input, change, keydown, submit, focus/blur, mouse）
+      6. 练习挑战
+  ============================================================ -->
+
+  <h1>DOM 事件处理 (Event Handling)</h1>
+
+  <!-- ==================== PART 1 ==================== -->
+  <div class="box">
+    <h2>PART 1: addEventListener / removeEventListener</h2>
+    <p>绑定事件的正确方式。对比 <code>onclick</code> 和 <code>addEventListener</code> 的区别。</p>
+
+    <button id="demo-button" style="font-size: 16px; padding: 10px 20px; background: #4a90d9; color: white; border-color: #4a90d9;">
+      点击我
+    </button>
+    <br /><br />
+    <button onclick="addListener()">添加监听器</button>
+    <button onclick="removeListener()">移除监听器</button>
+    <button onclick="demoOnclick()">对比 onclick 的限制</button>
+    <button onclick="resetPart1()">重置</button>
+    <div class="result" id="part1-log">（先点"添加监听器"，再点蓝色按钮）</div>
+  </div>
+
+  <!-- ==================== PART 2 ==================== -->
+  <div class="box">
+    <h2>PART 2: Event 对象</h2>
+    <p>事件处理函数自动接收一个 <code>Event</code> 对象，包含本次事件的全部信息。</p>
+
+    <button id="event-obj-btn" onclick="showEventProps(event)">点击查看 Event 对象属性</button>
+    <br /><br />
+    <a id="prevent-link" href="https://example.com">这个链接不会跳转（准备 preventDefault）</a>
+    <br />
+    <button onclick="setupPreventDefault()">为链接添加 preventDefault</button>
+    <button onclick="showCurrentTarget()">演示 target vs currentTarget</button>
+    <div class="result" id="part2-log"></div>
+  </div>
+
+  <!-- ==================== PART 3 ==================== -->
+  <div class="box">
+    <h2>PART 3: 事件冒泡与捕获 (Bubbling & Capturing)</h2>
+    <p>点击内层元素时，事件会沿 DOM 树传播。了解传播方向是理解事件委托的前提。</p>
+
+    <div class="bubble-outer" id="outer">
+      外层 (outer) — 黄色
+      <div class="bubble-middle" id="middle">
+        中层 (middle) — 蓝色
+        <div class="bubble-inner" id="inner">
+          内层 (inner) — 粉色 ← 点我
+        </div>
+      </div>
+    </div>
+    <br />
+    <button onclick="demoBubbling()">演示冒泡（默认）</button>
+    <button onclick="demoCapturing()">演示捕获（capture: true）</button>
+    <button onclick="demoStopPropagation()">演示 stopPropagation（在中层拦截）</button>
+    <button onclick="clearBubble()">清空 / 重置监听器</button>
+    <div class="result" id="part3-log">（点击上方按钮添加监听器，再点击彩色区域查看传播顺序）</div>
+  </div>
+
+  <!-- ==================== PART 4 ==================== -->
+  <div class="box">
+    <h2>PART 4: 事件委托 (Event Delegation)</h2>
+    <p>
+      把监听器绑定在<strong>父元素</strong>上，通过 <code>e.target</code> 判断实际点击的子元素。
+      这样动态新增的子元素也能自动被覆盖，且只需 1 个监听器。
+    </p>
+
+    <button onclick="setupDelegation()">设置事件委托（只绑定 1 个监听器到 &lt;ul&gt;）</button>
+    <button onclick="addDelegateItem()">动态添加新项目</button>
+    <button onclick="demoNoDelegation()">对比：逐个绑定（旧方式）</button>
+    <br /><br />
+    <ul class="delegate-list" id="delegate-list">
+      <li class="delegate-item" data-id="1">项目 A <button class="delete-btn">删除</button></li>
+      <li class="delegate-item" data-id="2">项目 B <button class="delete-btn">删除</button></li>
+      <li class="delegate-item" data-id="3">项目 C <button class="delete-btn">删除</button></li>
+    </ul>
+    <div class="result" id="part4-log">（先点"设置事件委托"，再点列表项或删除按钮）</div>
+  </div>
+
+  <!-- ==================== PART 5 ==================== -->
+  <div class="box">
+    <h2>PART 5: 常见事件类型</h2>
+
+    <!-- input / change -->
+    <h3>input vs change</h3>
+    <input type="text" id="text-input" placeholder="input：每次输入都触发">
+    <input type="range" id="range-input" min="0" max="100" value="50" style="vertical-align: middle;">
+    <span>change：只在松手时触发: <span id="range-val">50</span></span>
+    <div class="result" id="input-log"></div>
+
+    <!-- keydown -->
+    <h3>keydown / keyup</h3>
+    <input type="text" id="key-input" placeholder="按键盘试试（Esc 清空日志）">
+    <div class="result" id="key-log"></div>
+
+    <!-- focus / blur -->
+    <h3>focus / blur</h3>
+    <input type="text" id="focus-input" placeholder="点击进入 / 点击离开查看效果">
+    <div class="result" id="focus-log"></div>
+
+    <!-- submit -->
+    <h3>submit + preventDefault</h3>
+    <form id="demo-form" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <input type="text" name="username" placeholder="用户名" style="min-width: 150px;">
+      <button type="submit">提交（不会刷新页面）</button>
+    </form>
+    <div class="result" id="submit-log"></div>
+
+    <!-- mousemove -->
+    <h3>mouse 事件</h3>
+    <div id="mouse-zone" style="background: #e8f0fe; padding: 20px; border-radius: 4px; cursor: crosshair; text-align: center; user-select: none;">
+      在这里移动鼠标 / 点击
+    </div>
+    <div class="result" id="mouse-log"></div>
+  </div>
+
+  <!-- ==================== PART 6: 练习 ==================== -->
+  <div class="box">
+    <h2>PART 6: 练习挑战</h2>
+    <p>在看解答之前先自己想一想！</p>
+
+    <!-- 挑战 1 -->
+    <div class="exercise-box">
+      <h3>挑战 1 — Todo 列表（键盘 + 事件委托）</h3>
+      <p>
+        要求：在输入框按 Enter 添加新待办项；点击 × 按钮删除该项。<br />
+        难点：删除按钮是动态添加的 — 使用事件委托，不要给每个按钮单独绑定监听器。
+      </p>
+      <input type="text" id="ch1-input" placeholder="输入待办事项，按 Enter 添加">
+      <ul class="todo-list" id="ch1-list"></ul>
+      <button onclick="ch1ShowSolution()">查看解答并激活</button>
+      <div class="answer-block" id="ch1-answer"></div>
+    </div>
+
+    <!-- 挑战 2 -->
+    <div class="exercise-box">
+      <h3>挑战 2 — stopPropagation 问答</h3>
+      <p>
+        有三层嵌套元素（outer → middle → inner），每层都绑定了 click 监听器（冒泡）。
+        如果在 <strong>middle</strong> 层的处理函数中调用 <code>e.stopPropagation()</code>，
+        点击 inner 时：哪些处理函数会执行？
+      </p>
+      <label><input type="radio" name="ch2" value="a"> A — 只有 inner</label><br />
+      <label><input type="radio" name="ch2" value="b"> B — inner 和 middle</label><br />
+      <label><input type="radio" name="ch2" value="c"> C — inner、middle 和 outer</label><br />
+      <label><input type="radio" name="ch2" value="d"> D — 只有 outer</label><br />
+      <button onclick="ch2Check()" style="margin-top: 8px;">检查答案</button>
+      <div class="result" id="ch2-log"></div>
+    </div>
+
+    <!-- 挑战 3 -->
+    <div class="exercise-box">
+      <h3>挑战 3 — 实时表单验证</h3>
+      <p>
+        用 <code>input</code> 事件实时验证：邮箱必须包含 @，密码至少 8 位。
+        用 <code>classList</code> 切换 <code>.field-valid</code> / <code>.field-invalid</code> 样式（不要用 <code>style</code>）。
+      </p>
+      <div>
+        <input type="email" id="ch3-email" placeholder="邮箱">
+        <span class="field-hint" id="ch3-email-hint">请输入邮箱</span>
+      </div>
+      <div>
+        <input type="password" id="ch3-password" placeholder="密码（至少 8 位）">
+        <span class="field-hint" id="ch3-password-hint">请输入密码</span>
+      </div>
+      <button onclick="ch3Activate()">激活验证（查看解答）</button>
+      <div class="answer-block" id="ch3-answer"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // PART 1 — addEventListener / removeEventListener
+    //
+    // 为什么用 addEventListener 而不是 onclick？
+    //
+    //   onclick 只能绑定一个处理函数：
+    //     btn.onclick = fnA;
+    //     btn.onclick = fnB; // fnA 被覆盖，永远不会执行
+    //
+    //   addEventListener 可以绑定多个独立的处理函数：
+    //     btn.addEventListener("click", fnA); // fnA 和 fnB 都会执行
+    //     btn.addEventListener("click", fnB);
+    //
+    // 如何移除监听器？
+    //   removeEventListener 需要传入相同的函数引用。
+    //   因此，需要被移除的处理函数必须存为命名变量（不能用匿名函数）。
+    //
+    //   ❌ 错误：这个匿名函数永远无法被移除
+    //     btn.addEventListener("click", () => console.log("hi"));
+    //     btn.removeEventListener("click", () => console.log("hi")); // 不同引用，无效！
+    //
+    //   ✅ 正确：命名函数可以被移除
+    //     function handler() { console.log("hi"); }
+    //     btn.addEventListener("click", handler);
+    //     btn.removeEventListener("click", handler); // 有效！
+    // ============================================================
+
+    const part1Log = document.getElementById("part1-log");
+    const demoButton = document.getElementById("demo-button");
+    let clickCount = 0;
+
+    // 必须是命名函数（存为变量），才能被 removeEventListener 移除
+    function handleClick(e) {
+      clickCount++;
+      part1Log.textContent +=
+        `点击 #${clickCount}: type="${e.type}", target="${e.target.textContent.trim()}"\n`;
+      part1Log.scrollTop = part1Log.scrollHeight;
+    }
+
+    function addListener() {
+      // 同一个函数引用重复调用 addEventListener 不会重复绑定
+      demoButton.addEventListener("click", handleClick);
+      part1Log.textContent += "✓ 已添加 handleClick 监听器\n";
+    }
+
+    function removeListener() {
+      demoButton.removeEventListener("click", handleClick);
+      part1Log.textContent += "✗ 已移除 handleClick 监听器（再点击蓝色按钮不会有反应）\n";
+    }
+
+    function demoOnclick() {
+      // 演示 onclick 的覆盖问题
+      demoButton.onclick = () => {
+        part1Log.textContent += "处理函数 A 执行了\n";
+      };
+      demoButton.onclick = () => {
+        // 这行赋值会覆盖上面的处理函数 A，A 永远不会执行
+        part1Log.textContent += "处理函数 B 执行了（已覆盖 A，A 永远不会执行）\n";
+      };
+      part1Log.textContent += "⚠ onclick 已被设置为处理函数 B（A 被覆盖）\n现在点击蓝色按钮试试。\n";
+    }
+
+    function resetPart1() {
+      demoButton.onclick = null;
+      demoButton.removeEventListener("click", handleClick);
+      clickCount = 0;
+      part1Log.textContent = "（已重置）";
+    }
+
+
+    // ============================================================
+    // PART 2 — Event 对象
+    //
+    // 每个事件处理函数都会自动接收一个 Event 对象（习惯命名为 e 或 event）。
+    //
+    // 常用属性：
+    //   e.target         — 用户实际点击/操作的那个元素（事件的起源）
+    //   e.currentTarget  — 绑定了这个监听器的元素（"this" 的等价物）
+    //                      在事件委托中，这两个属性可能不同！
+    //   e.type           — 事件类型字符串，如 "click"、"keydown"
+    //   e.timeStamp      — 事件触发的时间（毫秒，从页面加载开始计算）
+    //   e.clientX/Y      — 鼠标事件：鼠标相对于视口的坐标
+    //
+    // 常用方法：
+    //   e.preventDefault()   — 阻止浏览器默认行为（链接跳转、表单提交等）
+    //   e.stopPropagation()  — 阻止事件继续冒泡到父元素（见 PART 3）
+    // ============================================================
+
+    const part2Log = document.getElementById("part2-log");
+
+    function showEventProps(e) {
+      part2Log.textContent =
+        "Event 对象属性:\n" +
+        `  e.type:          "${e.type}"\n` +
+        `  e.target:        <${e.target.tagName.toLowerCase()}> "${e.target.textContent.trim().slice(0, 30)}"\n` +
+        `  e.currentTarget: <${e.currentTarget.tagName.toLowerCase()}>\n` +
+        `  e.timeStamp:     ${e.timeStamp.toFixed(1)} ms\n` +
+        `  e.clientX/Y:     ${e.clientX}, ${e.clientY}\n` +
+        `  e.isTrusted:     ${e.isTrusted} （true = 真实用户操作，false = 代码触发）`;
+    }
+
+    function setupPreventDefault() {
+      const link = document.getElementById("prevent-link");
+      link.addEventListener("click", function (e) {
+        // 阻止链接的默认跳转行为
+        e.preventDefault();
+        part2Log.textContent =
+          "preventDefault() 已调用\n" +
+          "→ 链接的默认跳转行为被阻止了，页面没有跳转\n" +
+          "→ 常见用途：阻止表单提交刷新页面、阻止右键菜单等";
+      });
+      part2Log.textContent = "已为链接添加 preventDefault，现在点击链接试试";
+    }
+
+    function showCurrentTarget() {
+      // 在父元素上演示 target vs currentTarget 的区别
+      const box = document.querySelector(".box:nth-child(3)"); // PART 2 的 box
+      const tempHandler = function (e) {
+        part2Log.textContent =
+          "点击了 PART 2 区域的某处:\n" +
+          `  e.target (实际点击的元素):    <${e.target.tagName.toLowerCase()}>\n` +
+          `  e.currentTarget (绑定监听器的元素): <${e.currentTarget.tagName.toLowerCase()}>\n\n` +
+          "→ 当监听器绑定在父元素时，两者可能不同\n" +
+          "→ 事件委托正是利用了这个区别（见 PART 4）";
+        box.removeEventListener("click", tempHandler); // 只触发一次
+      };
+      box.addEventListener("click", tempHandler);
+      part2Log.textContent = "已绑定临时监听器到 PART 2 的盒子，点击盒子内任意位置查看区别";
+    }
+
+
+    // ============================================================
+    // PART 3 — 事件冒泡与捕获
+    //
+    // 事件传播分为三个阶段：
+    //   1. 捕获阶段（Capture）：从 document 向下传播到目标元素
+    //   2. 目标阶段（Target）：到达触发事件的元素
+    //   3. 冒泡阶段（Bubble）：从目标元素向上传播回 document
+    //
+    //   document → html → body → outer → middle → [inner] → middle → outer → ...
+    //               ←——— 捕获 ———→ ←目标→ ←——————————— 冒泡 ————————————→
+    //
+    // addEventListener 第三个参数：
+    //   false（默认）→ 在冒泡阶段触发（大多数情况用这个）
+    //   true         → 在捕获阶段触发（执行顺序 outer → middle → inner）
+    //
+    // 为什么要了解冒泡？
+    //   事件委托（PART 4）依赖冒泡：子元素的事件会冒泡到父元素，
+    //   父元素的监听器可以统一处理所有子元素。
+    //
+    // stopPropagation() 的注意事项：
+    //   它会静默阻止其他监听器接收事件，在大型应用中容易引发调试困难。
+    //   尽量避免使用，除非真的有必要阻止传播。
+    // ============================================================
+
+    const part3Log = document.getElementById("part3-log");
+    const outer = document.getElementById("outer");
+    const middle = document.getElementById("middle");
+    const inner = document.getElementById("inner");
+
+    // 存储监听器引用，方便后续移除
+    let bubbleHandlers = {};
+    let captureHandlers = {};
+
+    function clearBubble() {
+      // 移除所有已添加的监听器
+      ["outer", "middle", "inner"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (bubbleHandlers[id]) {
+          el.removeEventListener("click", bubbleHandlers[id], false);
+        }
+        if (captureHandlers[id]) {
+          el.removeEventListener("click", captureHandlers[id], true);
+        }
+      });
+      bubbleHandlers = {};
+      captureHandlers = {};
+      part3Log.textContent = "（已重置所有监听器）";
+    }
+
+    function demoBubbling() {
+      clearBubble();
+      part3Log.textContent = "冒泡演示：点击粉色内层，观察传播顺序\n";
+
+      ["outer", "middle", "inner"].forEach((id) => {
+        const el = document.getElementById(id);
+        // 第三个参数 false（默认）= 冒泡阶段触发
+        const handler = function (e) {
+          // stopPropagation 演示中用到，这里先注释掉
+          part3Log.textContent += `  → ${id} 的冒泡监听器执行了\n`;
+          part3Log.scrollTop = part3Log.scrollHeight;
+        };
+        bubbleHandlers[id] = handler;
+        el.addEventListener("click", handler, false);
+      });
+    }
+
+    function demoCapturing() {
+      clearBubble();
+      part3Log.textContent = "捕获演示：点击粉色内层，顺序与冒泡相反\n";
+
+      ["outer", "middle", "inner"].forEach((id) => {
+        const el = document.getElementById(id);
+        // 第三个参数 true = 捕获阶段触发（outer → middle → inner）
+        const handler = function (e) {
+          part3Log.textContent += `  → ${id} 的捕获监听器执行了\n`;
+          part3Log.scrollTop = part3Log.scrollHeight;
+        };
+        captureHandlers[id] = handler;
+        el.addEventListener("click", handler, true);
+      });
+    }
+
+    function demoStopPropagation() {
+      clearBubble();
+      part3Log.textContent = "stopPropagation 演示：middle 层会拦截，outer 不会收到事件\n";
+
+      ["outer", "middle", "inner"].forEach((id) => {
+        const el = document.getElementById(id);
+        const handler = function (e) {
+          part3Log.textContent += `  → ${id} 执行了\n`;
+          if (id === "middle") {
+            // 在 middle 拦截，outer 不会收到事件
+            e.stopPropagation();
+            part3Log.textContent += "    ↳ stopPropagation() 已调用，冒泡在此停止\n";
+          }
+          part3Log.scrollTop = part3Log.scrollHeight;
+        };
+        bubbleHandlers[id] = handler;
+        el.addEventListener("click", handler, false);
+      });
+    }
+
+
+    // ============================================================
+    // PART 4 — 事件委托 (Event Delegation)
+    //
+    // 问题：
+    //   如果列表有 100 个 <li>，给每个 <li> 添加监听器 = 100 个监听器（内存浪费）。
+    //   动态新增的 <li> 还需要手动再绑定 = 容易遗漏和出 bug。
+    //
+    // 解决方案：把监听器绑定在父元素 <ul> 上。
+    //   - 只需要 1 个监听器
+    //   - 利用冒泡：子元素的点击事件会冒泡到 <ul>
+    //   - 动态新增的子元素自动被覆盖，无需重新绑定
+    //   - 通过 e.target 判断是哪个子元素触发了事件
+    //
+    // 关键技巧：e.target.closest("li")
+    //   如果 <li> 里有 <button>，用户点击 <button> 时 e.target 是 <button>，不是 <li>。
+    //   closest("li") 从 e.target 开始向上查找最近的匹配 <li>。
+    // ============================================================
+
+    const part4Log = document.getElementById("part4-log");
+    let delegateItemCount = 4;
+    let delegationSetup = false;
+
+    function setupDelegation() {
+      if (delegationSetup) {
+        part4Log.textContent = "已经设置过了，只需要 1 个监听器覆盖所有列表项（包括未来动态添加的）";
+        return;
+      }
+
+      const list = document.getElementById("delegate-list");
+
+      // 整个列表只绑定 1 个监听器
+      list.addEventListener("click", function (e) {
+        // 找到被点击的最近 <li>（可能点到 <li> 内部的 <button> 上）
+        const item = e.target.closest(".delegate-item");
+        if (!item) return; // 点到了列表外部，忽略
+
+        if (e.target.classList.contains("delete-btn")) {
+          // 点击了删除按钮
+          const text = item.querySelector("button") ?
+            item.textContent.replace("删除", "").trim() : item.textContent.trim();
+          part4Log.textContent += `删除了: "${text}"\n`;
+          item.remove();
+        } else {
+          // 点击了列表项本身
+          part4Log.textContent += `点击了: "${e.target.textContent.trim()}" (id=${item.dataset.id})\n`;
+        }
+        part4Log.scrollTop = part4Log.scrollHeight;
+      });
+
+      delegationSetup = true;
+      part4Log.textContent = "✓ 事件委托已设置（只添加了 1 个监听器到 <ul>）\n现在点击列表项或删除按钮试试，也可以动态添加新项目。\n";
+    }
+
+    function addDelegateItem() {
+      const list = document.getElementById("delegate-list");
+      const li = document.createElement("li");
+      li.className = "delegate-item";
+      li.dataset.id = delegateItemCount++;
+      li.innerHTML = `项目 ${String.fromCharCode(64 + delegateItemCount - 1)} <button class="delete-btn">删除</button>`;
+      list.appendChild(li);
+      part4Log.textContent += `✓ 动态添加了新项目（无需重新绑定监听器！）\n`;
+      part4Log.scrollTop = part4Log.scrollHeight;
+    }
+
+    function demoNoDelegation() {
+      const list = document.getElementById("delegate-list");
+      const items = list.querySelectorAll(".delegate-item");
+      // 给每个现有 <li> 单独绑定监听器（旧方式）
+      items.forEach((item) => {
+        item.addEventListener("click", () => {}); // 空操作，只是演示数量
+      });
+      part4Log.textContent =
+        `⚠ 旧方式：给 ${items.length} 个现有元素各绑定了 1 个监听器 = ${items.length} 个监听器\n` +
+        "  动态添加的元素不会自动有监听器，需要手动绑定\n" +
+        "  事件委托只需要 1 个监听器，动态元素自动覆盖\n";
+    }
+
+
+    // ============================================================
+    // PART 5 — 常见事件类型
+    //
+    // input  — 用户每输入/删除一个字符立即触发（实时更新用这个）
+    // change — 输入框：用户完成输入并离开时触发；<select>/<checkbox>：选择改变时触发
+    //          区别：在输入框连续输入时，input 触发多次，change 只触发一次
+    //
+    // keydown  — 按下按键时触发，可以检查 e.key 和 e.code，可以 preventDefault
+    //            e.key = 按键代表的字符（"Enter"、"a"、"ArrowUp"）
+    //            e.code = 物理按键位置（"KeyA"、"Space"），不受键盘布局影响
+    //            e.ctrlKey / e.shiftKey / e.altKey / e.metaKey — 组合键状态
+    // keyup    — 松开按键时触发（通常用 keydown 即可）
+    //
+    // focus    — 元素获得焦点时触发（注意：focus 不冒泡！要委托要用 focusin）
+    // blur     — 元素失去焦点时触发（blur 也不冒泡，用 focusout 代替）
+    //
+    // submit   — 表单提交时触发（绑定在 <form> 上，不是 button）
+    //            一定要 preventDefault() 否则页面会刷新
+    //
+    // mousemove    — 鼠标在元素内移动时持续触发（高频！注意性能，考虑节流 throttle）
+    // mouseenter   — 鼠标进入元素时触发（不冒泡，推荐用于单个元素）
+    // mouseleave   — 鼠标离开元素时触发（不冒泡）
+    // mouseover    — 进入元素或其子元素时触发（会冒泡）
+    // ============================================================
+
+    // --- input / change ---
+    const inputLog = document.getElementById("input-log");
+
+    document.getElementById("text-input").addEventListener("input", function (e) {
+      // input 事件：每输入一个字符立即触发
+      inputLog.textContent = `input 事件: "${e.target.value}" (length: ${e.target.value.length})`;
+    });
+
+    const rangeInput = document.getElementById("range-input");
+    const rangeVal = document.getElementById("range-val");
+    rangeInput.addEventListener("input", function (e) {
+      // range 的 input 事件：拖动时实时更新
+      rangeVal.textContent = e.target.value + " (拖动中...)";
+    });
+    rangeInput.addEventListener("change", function (e) {
+      // change 事件：松手后触发（最终值）
+      rangeVal.textContent = e.target.value + " ← change 触发了";
+      inputLog.textContent += `\nchange 事件: 最终值 = ${e.target.value}`;
+    });
+
+    // --- keydown ---
+    const keyLog = document.getElementById("key-log");
+    document.getElementById("key-input").addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        keyLog.textContent = "（按 Esc 清空日志了）";
+        return;
+      }
+      keyLog.textContent =
+        `keydown:\n` +
+        `  e.key:     "${e.key}"\n` +
+        `  e.code:    "${e.code}"\n` +
+        `  Ctrl:${e.ctrlKey} Shift:${e.shiftKey} Alt:${e.altKey} Meta:${e.metaKey}`;
+    });
+
+    // --- focus / blur ---
+    const focusLog = document.getElementById("focus-log");
+    const focusInput = document.getElementById("focus-input");
+    focusInput.addEventListener("focus", function () {
+      // focus 不冒泡 — 只能绑定在目标元素上
+      focusInput.style.outline = "3px solid #4a90d9";
+      focusLog.textContent = "focus: 输入框获得焦点";
+    });
+    focusInput.addEventListener("blur", function () {
+      focusInput.style.outline = "";
+      focusLog.textContent = "blur: 输入框失去焦点（用户离开了）";
+    });
+
+    // --- submit ---
+    const submitLog = document.getElementById("submit-log");
+    document.getElementById("demo-form").addEventListener("submit", function (e) {
+      // 阻止默认的表单提交（否则页面会刷新）
+      e.preventDefault();
+
+      // 用 FormData 读取表单数据（比手动 querySelectorAll 更方便）
+      const data = new FormData(e.target);
+      const values = Object.fromEntries(data.entries());
+      submitLog.textContent =
+        "submit 事件触发（页面没有刷新）\n" +
+        "FormData: " + JSON.stringify(values);
+    });
+
+    // --- mouse 事件 ---
+    const mouseLog = document.getElementById("mouse-log");
+    const mouseZone = document.getElementById("mouse-zone");
+
+    mouseZone.addEventListener("mouseenter", function () {
+      mouseLog.textContent = "mouseenter: 鼠标进入区域";
+      mouseZone.style.background = "#c8e6c9";
+    });
+    mouseZone.addEventListener("mouseleave", function () {
+      mouseLog.textContent = "mouseleave: 鼠标离开区域";
+      mouseZone.style.background = "#e8f0fe";
+    });
+    mouseZone.addEventListener("mousemove", function (e) {
+      // mousemove 高频触发，注意性能！实际项目中考虑用 throttle 限流
+      mouseLog.textContent =
+        `mousemove: clientX=${e.clientX}, clientY=${e.clientY}\n` +
+        `           offsetX=${e.offsetX}, offsetY=${e.offsetY}（相对于元素）`;
+    });
+    mouseZone.addEventListener("click", function (e) {
+      mouseLog.textContent =
+        `click: clientX=${e.clientX}, clientY=${e.clientY}\n` +
+        `       button=${e.button} (0=左键, 1=中键, 2=右键)`;
+    });
+
+
+    // ============================================================
+    // PART 6 — 练习挑战
+    // ============================================================
+
+    // --- 挑战 1: Todo 列表 ---
+    function ch1ShowSolution() {
+      const answerEl = document.getElementById("ch1-answer");
+      answerEl.textContent =
+`// 解答：Enter 键添加 + 事件委托删除
+
+const input = document.getElementById("ch1-input");
+const list = document.getElementById("ch1-list");
+
+// 1. 监听 Enter 键
+input.addEventListener("keydown", function (e) {
+  if (e.key !== "Enter") return;
+  const text = e.target.value.trim();
+  if (!text) return;
+
+  const li = document.createElement("li");
+  li.className = "todo-item";
+  li.innerHTML = \`\${text} <button class="todo-delete">×</button>\`;
+  list.appendChild(li);
+
+  e.target.value = ""; // 清空输入框
+});
+
+// 2. 事件委托：只绑定 1 个监听器到 <ul>
+list.addEventListener("click", function (e) {
+  if (e.target.classList.contains("todo-delete")) {
+    e.target.closest(".todo-item").remove();
+  }
+});`;
+      answerEl.classList.add("visible");
+
+      // 激活功能
+      const input = document.getElementById("ch1-input");
+      const list = document.getElementById("ch1-list");
+
+      input.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        const text = e.target.value.trim();
+        if (!text) return;
+        const li = document.createElement("li");
+        li.className = "todo-item";
+        li.innerHTML = `${text} <button class="todo-delete">×</button>`;
+        list.appendChild(li);
+        e.target.value = "";
+      });
+
+      list.addEventListener("click", function (e) {
+        if (e.target.classList.contains("todo-delete")) {
+          e.target.closest(".todo-item").remove();
+        }
+      });
+    }
+
+    // --- 挑战 2: stopPropagation 问答 ---
+    function ch2Check() {
+      const selected = document.querySelector('input[name="ch2"]:checked');
+      const log = document.getElementById("ch2-log");
+      if (!selected) {
+        log.textContent = "请先选择一个答案";
+        return;
+      }
+      if (selected.value === "b") {
+        log.textContent =
+          "✓ 正确！答案是 B — inner 和 middle 的处理函数都会执行。\n\n" +
+          "传播顺序：inner → middle → [stopPropagation] → outer 被拦截\n\n" +
+          "说明：\n" +
+          "  - inner 是事件起源（目标阶段），一定会触发\n" +
+          "  - middle 是冒泡路径上的第一站，也会触发\n" +
+          "  - middle 调用了 stopPropagation()，往上的 outer 不再收到事件";
+      } else {
+        log.textContent =
+          `✗ 答案是 B（你选了 ${selected.value.toUpperCase()}）\n\n` +
+          "inner 触发（自身），然后事件冒泡到 middle（middle 也触发），\n" +
+          "middle 调用 stopPropagation() 后，outer 不再收到事件。";
+      }
+    }
+
+    // --- 挑战 3: 实时表单验证 ---
+    function ch3Activate() {
+      const answerEl = document.getElementById("ch3-answer");
+      answerEl.textContent =
+`// 解答：用 classList 切换验证状态
+
+const emailInput = document.getElementById("ch3-email");
+const pwInput = document.getElementById("ch3-password");
+
+function validateEmail(e) {
+  const valid = e.target.value.includes("@");
+  // classList.toggle(class, condition) — 第二个参数控制是加还是删
+  e.target.classList.toggle("field-valid", valid);
+  e.target.classList.toggle("field-invalid", !valid && e.target.value.length > 0);
+  document.getElementById("ch3-email-hint").textContent =
+    valid ? "✓ 邮箱格式正确" : "✗ 邮箱必须包含 @";
+}
+
+function validatePassword(e) {
+  const valid = e.target.value.length >= 8;
+  e.target.classList.toggle("field-valid", valid);
+  e.target.classList.toggle("field-invalid", !valid && e.target.value.length > 0);
+  document.getElementById("ch3-password-hint").textContent =
+    valid ? "✓ 密码长度合格" : \`✗ 还需 \${8 - e.target.value.length} 个字符\`;
+}
+
+emailInput.addEventListener("input", validateEmail);
+pwInput.addEventListener("input", validatePassword);`;
+      answerEl.classList.add("visible");
+
+      // 激活
+      const emailInput = document.getElementById("ch3-email");
+      const pwInput = document.getElementById("ch3-password");
+      const emailHint = document.getElementById("ch3-email-hint");
+      const pwHint = document.getElementById("ch3-password-hint");
+
+      emailInput.addEventListener("input", function (e) {
+        const valid = e.target.value.includes("@");
+        e.target.classList.toggle("field-valid", valid);
+        e.target.classList.toggle("field-invalid", !valid && e.target.value.length > 0);
+        emailHint.textContent = valid ? "✓ 邮箱格式正确" : "✗ 邮箱必须包含 @";
+      });
+
+      pwInput.addEventListener("input", function (e) {
+        const valid = e.target.value.length >= 8;
+        e.target.classList.toggle("field-valid", valid);
+        e.target.classList.toggle("field-invalid", !valid && e.target.value.length > 0);
+        pwHint.textContent = valid ? "✓ 密码长度合格" : `✗ 还需 ${8 - e.target.value.length} 个字符`;
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>03 — classList API 与属性操作 (classList & Attributes)</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    .box { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .result { background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap; font-family: monospace; }
+    button { padding: 6px 14px; margin: 4px; cursor: pointer; border: 1px solid #999; border-radius: 3px; background: #fff; }
+    button:hover { background: #eee; }
+
+    /* classList 示例用到的样式 */
+    .text-red { color: red; }
+    .text-blue { color: blue; }
+    .text-large { font-size: 24px; }
+    .bg-yellow { background-color: #ffffcc; }
+    .border-bold { border: 3px solid #333; padding: 10px; }
+    .rounded { border-radius: 12px; }
+    .shadow { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .hidden { display: none; }
+
+    .theme-dark { background: #333; color: #fff; padding: 10px; border-radius: 4px; }
+    .theme-light { background: #fff; color: #333; padding: 10px; border-radius: 4px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+    03 — classList API 与属性操作
+
+    在浏览器中打开此文件，点击按钮查看效果。
+
+    本文件涵盖：
+      1. classList API（add, remove, toggle, contains, replace）
+      2. HTML 属性操作（getAttribute, setAttribute, removeAttribute）
+      3. 属性 vs 特性 (Attributes vs Properties)
+      4. data-* 自定义属性
+  ============================================================ -->
+
+  <h1>classList API 与属性操作</h1>
+
+  <!-- PART 1: classList -->
+  <div class="box">
+    <h2>PART 1: classList API</h2>
+    <p id="class-target" class="theme-light">
+      这段文字的样式会被 classList 方法修改。当前 class 见下方。
+    </p>
+    <div>
+      <button onclick="classAdd()">add 添加类</button>
+      <button onclick="classRemove()">remove 移除类</button>
+      <button onclick="classToggle()">toggle 切换暗/亮</button>
+      <button onclick="classReplace()">replace 替换类</button>
+      <button onclick="classContains()">contains 检查类</button>
+      <button onclick="classReset()">重置</button>
+    </div>
+    <div class="result" id="class-log"></div>
+  </div>
+
+  <!-- PART 2: 属性操作 -->
+  <div class="box">
+    <h2>PART 2: HTML 属性操作</h2>
+    <a id="link-demo" href="https://example.com" target="_blank" title="示例链接">
+      这是一个链接
+    </a>
+    <br /><br />
+    <img id="img-demo" src="" alt="示例图片" width="100" />
+    <div>
+      <button onclick="getAttrs()">读取属性</button>
+      <button onclick="setAttrs()">设置属性</button>
+      <button onclick="removeAttrs()">删除属性</button>
+      <button onclick="hasAttrs()">检查属性</button>
+    </div>
+    <div class="result" id="attr-log"></div>
+  </div>
+
+  <!-- PART 3: Attributes vs Properties -->
+  <div class="box">
+    <h2>PART 3: 属性 vs 特性 (Attributes vs Properties)</h2>
+    <input id="input-demo" type="text" value="初始值" />
+    <button onclick="showAttrVsProp()">对比 attribute 和 property</button>
+    <p style="color: gray; font-size: 14px;">先修改输入框的内容，再点击按钮查看区别。</p>
+    <div class="result" id="avp-log"></div>
+  </div>
+
+  <!-- PART 4: data-* 属性 -->
+  <div class="box">
+    <h2>PART 4: data-* 自定义属性</h2>
+    <ul id="product-list">
+      <li data-id="1" data-price="29.9" data-category="book">JavaScript 高级程序设计</li>
+      <li data-id="2" data-price="59.0" data-category="course">前端训练营</li>
+      <li data-id="3" data-price="15.5" data-category="book">CSS 揭秘</li>
+    </ul>
+    <button onclick="readDataAttrs()">读取 data 属性</button>
+    <button onclick="modifyDataAttrs()">修改 data 属性</button>
+    <div class="result" id="data-log"></div>
+  </div>
+
+  <script>
+    // ============================================================
+    // PART 1 — classList API
+    //
+    // 管理元素 CSS 类的首选方式。
+    //   add("a", "b")     — 添加一个或多个类
+    //   remove("a", "b")  — 移除一个或多个类
+    //   toggle("a")       — 有则移除，无则添加
+    //   contains("a")     — 是否包含某个类
+    //   replace("a", "b") — 用 b 替换 a
+    // ============================================================
+
+    const classTarget = document.getElementById("class-target");
+    const classLog = document.getElementById("class-log");
+
+    function updateClassLog(action) {
+      classLog.textContent =
+        "操作: " + action + "\n" +
+        "当前 classList: " + [...classTarget.classList].join(", ");
+    }
+
+    function classAdd() {
+      // 可以一次添加多个类
+      classTarget.classList.add("text-large", "bg-yellow", "shadow");
+      updateClassLog('add("text-large", "bg-yellow", "shadow")');
+    }
+
+    function classRemove() {
+      classTarget.classList.remove("text-large", "bg-yellow", "shadow");
+      updateClassLog('remove("text-large", "bg-yellow", "shadow")');
+    }
+
+    function classToggle() {
+      // toggle — 切换：有就删，没有就加
+      // 非常适合做开关效果（暗/亮模式、展开/收起等）
+      classTarget.classList.toggle("theme-dark");
+      classTarget.classList.toggle("theme-light");
+      updateClassLog('toggle("theme-dark") + toggle("theme-light")');
+    }
+
+    function classReplace() {
+      // 把一个类替换为另一个
+      if (classTarget.classList.contains("theme-light")) {
+        classTarget.classList.replace("theme-light", "theme-dark");
+        updateClassLog('replace("theme-light", "theme-dark")');
+      } else {
+        classTarget.classList.replace("theme-dark", "theme-light");
+        updateClassLog('replace("theme-dark", "theme-light")');
+      }
+    }
+
+    function classContains() {
+      const hasDark = classTarget.classList.contains("theme-dark");
+      const hasLight = classTarget.classList.contains("theme-light");
+      const hasShadow = classTarget.classList.contains("shadow");
+      classLog.textContent =
+        'contains("theme-dark"): ' + hasDark + "\n" +
+        'contains("theme-light"): ' + hasLight + "\n" +
+        'contains("shadow"): ' + hasShadow;
+    }
+
+    function classReset() {
+      classTarget.className = "theme-light";
+      updateClassLog("重置为 theme-light");
+    }
+
+
+    // ============================================================
+    // PART 2 — HTML 属性操作
+    //
+    // getAttribute("name")          — 获取属性值
+    // setAttribute("name", "value") — 设置属性值
+    // removeAttribute("name")       — 删除属性
+    // hasAttribute("name")          — 是否有某属性
+    // ============================================================
+
+    const attrLog = document.getElementById("attr-log");
+    const link = document.getElementById("link-demo");
+
+    function getAttrs() {
+      const href = link.getAttribute("href");
+      const target = link.getAttribute("target");
+      const title = link.getAttribute("title");
+      const noExist = link.getAttribute("data-foo");
+
+      attrLog.textContent =
+        'getAttribute("href"): ' + href + "\n" +
+        'getAttribute("target"): ' + target + "\n" +
+        'getAttribute("title"): ' + title + "\n" +
+        'getAttribute("data-foo"): ' + noExist + "（不存在时返回 null）";
+    }
+
+    function setAttrs() {
+      link.setAttribute("title", "修改后的标题");
+      link.setAttribute("data-custom", "hello");
+
+      const img = document.getElementById("img-demo");
+      img.setAttribute("alt", "新的描述");
+      img.setAttribute("width", "200");
+
+      attrLog.textContent =
+        '已设置 link title = "修改后的标题"\n' +
+        '已设置 link data-custom = "hello"\n' +
+        '已设置 img width = "200"';
+    }
+
+    function removeAttrs() {
+      link.removeAttribute("title");
+      link.removeAttribute("data-custom");
+
+      attrLog.textContent =
+        '已删除 link title 属性\n' +
+        '已删除 link data-custom 属性';
+    }
+
+    function hasAttrs() {
+      attrLog.textContent =
+        'hasAttribute("href"): ' + link.hasAttribute("href") + "\n" +
+        'hasAttribute("title"): ' + link.hasAttribute("title") + "\n" +
+        'hasAttribute("data-custom"): ' + link.hasAttribute("data-custom");
+    }
+
+
+    // ============================================================
+    // PART 3 — Attributes vs Properties
+    //
+    // Attribute: HTML 源码中写的（通过 getAttribute 访问）
+    // Property:  JS 对象上的属性（通过 . 或 [] 访问）
+    //
+    // 大多数情况它们是同步的，但有些特殊情况不同步：
+    //   - input 的 value：attribute 是初始值，property 是当前值
+    //   - checkbox 的 checked/disabled：类似
+    //   - href：getAttribute("href") 返回原始 HTML 字符串，
+    //           .href 返回浏览器解析后的完整 URL
+    //
+    // 为什么要了解这个区别？
+    //   大多数框架（React、Vue 等）在绑定数据时操作的是 Property，
+    //   而不是 Attribute。比如 React 的 value={state} 绑定的是
+    //   input.value (property)，不是 HTML 的 value attribute。
+    //   当遇到"表单数据无法正确绑定"或"getAttribute 返回旧值"的 bug 时，
+    //   往往是混淆了这两个概念。
+    // ============================================================
+
+    function showAttrVsProp() {
+      const input = document.getElementById("input-demo");
+      const avpLog = document.getElementById("avp-log");
+
+      avpLog.textContent =
+        "--- Attribute（HTML 原始值） ---\n" +
+        'getAttribute("value"): "' + input.getAttribute("value") + '"\n\n' +
+        "--- Property（JS 当前值） ---\n" +
+        'input.value: "' + input.value + '"\n\n' +
+        "--- 区别 ---\n" +
+        "Attribute 始终是 HTML 中写的初始值\n" +
+        "Property 是用户修改后的当前值\n" +
+        "在输入框中输入新内容后，property 变了，attribute 不变";
+    }
+
+
+    // ============================================================
+    // PART 4 — data-* 自定义属性
+    //
+    // HTML5 允许用 data-xxx 添加自定义数据。
+    // JS 中通过 element.dataset.xxx 访问（自动去掉 data- 前缀）。
+    //
+    // data-price     → element.dataset.price
+    // data-user-name → element.dataset.userName（自动转驼峰）
+    // ============================================================
+
+    const dataLog = document.getElementById("data-log");
+
+    function readDataAttrs() {
+      const items = document.querySelectorAll("#product-list li");
+      let text = "";
+
+      items.forEach((item) => {
+        // dataset 自动把 data-xxx 映射为 dataset.xxx
+        const { id, price, category } = item.dataset;
+        text +=
+          item.textContent + "\n" +
+          "  dataset.id: " + id + "\n" +
+          "  dataset.price: " + price + "\n" +
+          "  dataset.category: " + category + "\n\n";
+      });
+
+      // 也可以用 getAttribute
+      const first = items[0];
+      text += "--- getAttribute 方式 ---\n";
+      text += 'getAttribute("data-price"): ' + first.getAttribute("data-price");
+
+      dataLog.textContent = text;
+    }
+
+    function modifyDataAttrs() {
+      const items = document.querySelectorAll("#product-list li");
+
+      // 通过 dataset 修改
+      items[0].dataset.price = "19.9";
+      items[0].dataset.onSale = "true"; // 自动变为 data-on-sale 属性
+
+      // 通过 setAttribute 修改
+      items[1].setAttribute("data-price", "49.0");
+
+      dataLog.textContent =
+        "已修改:\n" +
+        "  第1项 dataset.price = '19.9'\n" +
+        "  第1项 dataset.onSale = 'true' → HTML 中变为 data-on-sale='true'\n" +
+        "  第2项 setAttribute('data-price', '49.0')\n\n" +
+        "验证:\n" +
+        "  第1项 data-price: " + items[0].dataset.price + "\n" +
+        "  第1项 data-on-sale: " + items[0].dataset.onSale + "\n" +
+        "  第2项 data-price: " + items[1].dataset.price;
+    }
+  </script>
+
+  <!-- ==================== 练习挑战 ==================== -->
+  <div style="border: 1px solid #4a90d9; padding: 15px; margin: 15px 0; border-radius: 4px;">
+    <h2>练习挑战</h2>
+    <p style="color: #666;">在看解答之前先自己想一想！</p>
+
+    <!-- 挑战 1 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 1：classList.toggle 实现暗/亮模式切换</strong>
+      <p>点击"切换模式"按钮，用 <code>classList.toggle</code> 让下方盒子在暗色/亮色主题之间切换。</p>
+      <div id="ch1-box" class="theme-light" style="padding: 15px; border-radius: 4px; margin: 10px 0; transition: all 0.3s;">
+        这个盒子的主题会被切换
+      </div>
+      <button onclick="ch1Toggle()">切换模式</button>
+      <button onclick="ch1ShowSolution()">查看解答</button>
+      <pre id="ch1-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+
+    <!-- 挑战 2 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 2：用 dataset 过滤并高亮元素</strong>
+      <p>点击"高亮 Book 类别"，找出所有 <code>data-category="book"</code> 的产品，
+      为它们添加 <code>.bg-yellow</code> 类（CSS 已定义好）。</p>
+      <ul id="ch2-products">
+        <li data-category="book" data-price="29.9">JavaScript 高级程序设计</li>
+        <li data-category="course" data-price="59.0">前端训练营</li>
+        <li data-category="book" data-price="15.5">CSS 揭秘</li>
+        <li data-category="tool" data-price="0">VS Code</li>
+        <li data-category="book" data-price="45.0">你不知道的 JS</li>
+      </ul>
+      <button onclick="ch2Highlight()">高亮 Book 类别</button>
+      <button onclick="ch2Reset()">重置</button>
+      <button onclick="ch2ShowSolution()">查看解答</button>
+      <pre id="ch2-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+
+    <!-- 挑战 3 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 3：getAttribute vs property 的区别（checkbox）</strong>
+      <p>
+        下方有一个初始选中的 checkbox。先在浏览器中取消勾选它，
+        再点"对比"按钮，看看 <code>getAttribute("checked")</code>
+        和 <code>checkbox.checked</code> 的返回值有何不同。
+      </p>
+      <label>
+        <input type="checkbox" id="ch3-checkbox" checked>
+        我是一个 checkbox（试着取消勾选）
+      </label>
+      <br /><br />
+      <button onclick="ch3Compare()">对比 attribute vs property</button>
+      <div style="background: #f0f0f0; padding: 8px; margin: 8px 0; font-family: monospace; white-space: pre-wrap; border-radius: 3px;" id="ch3-log"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 练习挑战的实现 ====================
+
+    function ch1Toggle() {
+      // classList.toggle(class) — 有则删，无则加
+      // 同时 toggle 两个互斥的类，实现开关效果
+      const box = document.getElementById("ch1-box");
+      box.classList.toggle("theme-dark");
+      box.classList.toggle("theme-light");
+    }
+
+    function ch1ShowSolution() {
+      const ans = document.getElementById("ch1-answer");
+      ans.textContent =
+`// 解答：用 classList.toggle 切换两个互斥的主题类
+const box = document.getElementById("ch1-box");
+box.classList.toggle("theme-dark");   // 有则删，无则加
+box.classList.toggle("theme-light");  // 相反效果，实现互斥切换
+
+// 也可以用 classList.replace：
+// if (box.classList.contains("theme-light")) {
+//   box.classList.replace("theme-light", "theme-dark");
+// } else {
+//   box.classList.replace("theme-dark", "theme-light");
+// }`;
+      ans.style.display = "block";
+    }
+
+    function ch2Highlight() {
+      // 用属性选择器找到所有 data-category="book" 的元素
+      const books = document.querySelectorAll('#ch2-products [data-category="book"]');
+      books.forEach((item) => item.classList.add("bg-yellow"));
+    }
+
+    function ch2Reset() {
+      document.querySelectorAll("#ch2-products li").forEach((item) => {
+        item.classList.remove("bg-yellow");
+      });
+    }
+
+    function ch2ShowSolution() {
+      const ans = document.getElementById("ch2-answer");
+      ans.textContent =
+`// 解答：用属性选择器 + classList.add 高亮目标元素
+const books = document.querySelectorAll('#ch2-products [data-category="book"]');
+books.forEach(function(item) {
+  item.classList.add("bg-yellow");
+});
+
+// 也可以用 dataset 过滤：
+// const all = document.querySelectorAll("#ch2-products li");
+// all.forEach(function(item) {
+//   if (item.dataset.category === "book") {
+//     item.classList.add("bg-yellow");
+//   }
+// });`;
+      ans.style.display = "block";
+    }
+
+    function ch3Compare() {
+      const checkbox = document.getElementById("ch3-checkbox");
+      const log = document.getElementById("ch3-log");
+
+      // getAttribute("checked") — HTML attribute，反映初始状态
+      const attrVal = checkbox.getAttribute("checked");
+
+      // checkbox.checked — JS property，反映当前实际状态
+      const propVal = checkbox.checked;
+
+      log.textContent =
+        `getAttribute("checked"): ${JSON.stringify(attrVal)}\n` +
+        `                         （始终是初始 HTML 的值，不随用户操作更新）\n\n` +
+        `checkbox.checked:        ${propVal}\n` +
+        `                         （当前实际状态，随用户勾选/取消更新）\n\n` +
+        `结论：\n` +
+        `  - attribute "checked" 在 HTML 中写了就是 ""（空字符串），没写就是 null\n` +
+        `  - property .checked 是 true/false 的布尔值，实时反映用户状态\n` +
+        `  - 要获取表单的当前值，永远用 property，不用 getAttribute`;
+    }
+  </script>
+
+</body>
+</html>

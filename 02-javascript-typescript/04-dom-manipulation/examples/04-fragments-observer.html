@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>04 — Document Fragments 与 MutationObserver</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    .box { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .result { background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap; font-family: monospace; max-height: 300px; overflow-y: auto; }
+    button { padding: 6px 14px; margin: 4px; cursor: pointer; border: 1px solid #999; border-radius: 3px; background: #fff; }
+    button:hover { background: #eee; }
+    .perf-good { color: green; }
+    .perf-bad { color: red; }
+    .list-item { padding: 2px 8px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+    04 — Document Fragments 与 MutationObserver
+
+    在浏览器中打开此文件，点击按钮查看效果。
+
+    本文件涵盖：
+      1. Document Fragments — 批量 DOM 操作优化
+      2. 性能对比：逐个添加 vs Fragment
+      3. MutationObserver — 监听 DOM 变化
+  ============================================================ -->
+
+  <h1>Document Fragments 与 MutationObserver</h1>
+
+  <!-- PART 1: Document Fragment -->
+  <div class="box">
+    <h2>PART 1: Document Fragment</h2>
+    <p>Document Fragment 是一个"虚拟容器"，不在 DOM 中。先把元素添加到 Fragment 中，最后一次性插入 DOM，减少页面重绘次数。</p>
+    <button onclick="addWithoutFragment()">逐个添加 1000 项</button>
+    <button onclick="addWithFragment()">用 Fragment 添加 1000 项</button>
+    <button onclick="clearLists()">清空</button>
+    <div class="result" id="frag-log"></div>
+    <div style="display: flex; gap: 20px;">
+      <div style="flex: 1;">
+        <h3>逐个添加的列表</h3>
+        <div id="list-no-fragment" style="max-height: 200px; overflow-y: auto;"></div>
+      </div>
+      <div style="flex: 1;">
+        <h3>Fragment 添加的列表</h3>
+        <div id="list-with-fragment" style="max-height: 200px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART 2: 性能对比 -->
+  <div class="box">
+    <h2>PART 2: 性能对比</h2>
+    <p>对比三种批量添加 DOM 元素的方式。</p>
+    <button onclick="perfCompare()">运行性能对比（添加 5000 项）</button>
+    <div class="result" id="perf-log"></div>
+    <div id="perf-container" style="display: none;"></div>
+  </div>
+
+  <!-- PART 3: MutationObserver -->
+  <div class="box">
+    <h2>PART 3: MutationObserver</h2>
+    <p>MutationObserver 可以监听 DOM 树的变化（新增/删除节点、属性变化、文本变化等）。</p>
+    <div id="observed-container" style="border: 2px dashed #4a90d9; padding: 10px; min-height: 50px;">
+      <p id="observed-text">这个容器正在被 MutationObserver 监视</p>
+    </div>
+    <div style="margin-top: 10px;">
+      <button onclick="startObserving()">开始监听</button>
+      <button onclick="stopObserving()">停止监听</button>
+      <button onclick="addObservedChild()">添加子元素</button>
+      <button onclick="removeObservedChild()">删除子元素</button>
+      <button onclick="changeObservedAttr()">修改属性</button>
+      <button onclick="changeObservedText()">修改文字</button>
+    </div>
+    <div class="result" id="observer-log">（点击"开始监听"后，对容器做操作，变化会记录在这里）</div>
+  </div>
+
+  <script>
+    // ============================================================
+    // PART 1 — Document Fragment
+    //
+    // 问题：每次 appendChild 都会触发浏览器重新布局和绘制。
+    //       如果添加 1000 个元素，就触发 1000 次重绘。
+    //
+    // 解决：先把元素添加到 DocumentFragment（内存中的虚拟容器），
+    //       最后一次性添加到 DOM，只触发 1 次重绘。
+    // ============================================================
+
+    const fragLog = document.getElementById("frag-log");
+
+    function addWithoutFragment() {
+      const container = document.getElementById("list-no-fragment");
+      container.innerHTML = "";
+
+      const start = performance.now();
+
+      // 逐个添加 — 每次 appendChild 都触发重绘
+      for (let i = 0; i < 1000; i++) {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.textContent = "逐个添加 #" + (i + 1);
+        container.appendChild(div); // 每次都触发重绘！
+      }
+
+      const time = (performance.now() - start).toFixed(2);
+      fragLog.textContent = "逐个添加 1000 项: " + time + " ms";
+    }
+
+    function addWithFragment() {
+      const container = document.getElementById("list-with-fragment");
+      container.innerHTML = "";
+
+      const start = performance.now();
+
+      // 用 DocumentFragment — 只触发一次重绘
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < 1000; i++) {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.textContent = "Fragment #" + (i + 1);
+        fragment.appendChild(div); // 添加到 fragment（内存中，无重绘）
+      }
+
+      container.appendChild(fragment); // 一次性添加到 DOM，只触发一次重绘
+
+      const time = (performance.now() - start).toFixed(2);
+      fragLog.textContent += "\nFragment 添加 1000 项: " + time + " ms";
+    }
+
+    function clearLists() {
+      document.getElementById("list-no-fragment").innerHTML = "";
+      document.getElementById("list-with-fragment").innerHTML = "";
+      fragLog.textContent = "";
+    }
+
+
+    // ============================================================
+    // PART 2 — 性能对比
+    //
+    // 三种方式：
+    //   1. 逐个 appendChild（最慢）
+    //   2. DocumentFragment（快）
+    //   3. innerHTML 拼接字符串（也快，但有 XSS 风险）
+    // ============================================================
+
+    function perfCompare() {
+      const perfLog = document.getElementById("perf-log");
+      const container = document.getElementById("perf-container");
+      const count = 5000;
+      const results = [];
+
+      // 方式 1: 逐个 appendChild
+      container.innerHTML = "";
+      let start = performance.now();
+      for (let i = 0; i < count; i++) {
+        const div = document.createElement("div");
+        div.textContent = "item " + i;
+        container.appendChild(div);
+      }
+      results.push((performance.now() - start).toFixed(2));
+
+      // 方式 2: DocumentFragment
+      container.innerHTML = "";
+      start = performance.now();
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < count; i++) {
+        const div = document.createElement("div");
+        div.textContent = "item " + i;
+        fragment.appendChild(div);
+      }
+      container.appendChild(fragment);
+      results.push((performance.now() - start).toFixed(2));
+
+      // 方式 3: innerHTML 字符串拼接
+      container.innerHTML = "";
+      start = performance.now();
+      let html = "";
+      for (let i = 0; i < count; i++) {
+        html += "<div>item " + i + "</div>";
+      }
+      container.innerHTML = html;
+      results.push((performance.now() - start).toFixed(2));
+
+      container.innerHTML = "";
+
+      perfLog.textContent =
+        "添加 " + count + " 个元素的耗时对比:\n\n" +
+        "  1. 逐个 appendChild:    " + results[0] + " ms\n" +
+        "  2. DocumentFragment:    " + results[1] + " ms\n" +
+        "  3. innerHTML 拼接:      " + results[2] + " ms\n\n" +
+        "结论:\n" +
+        "  - Fragment 和 innerHTML 通常比逐个添加快\n" +
+        "  - innerHTML 更简洁但有 XSS 风险（不要拼接用户输入）\n" +
+        "  - Fragment 是安全的推荐方式\n" +
+        "  - 实际框架（React/Vue）会自动优化 DOM 更新";
+    }
+
+
+    // ============================================================
+    // PART 3 — MutationObserver
+    //
+    // 监听 DOM 变化的 API。常用场景：
+    //   - 监听第三方库对 DOM 的修改（当你没有源码控制权时）
+    //   - 动态内容加载完成后执行初始化（如懒加载图片、广告注入等）
+    //   - 实现自动化测试中的 DOM 断言
+    //   - 构建字数计数器、实时预览等功能
+    //
+    // 关键特性：MutationObserver 是异步的！
+    //   它不会在每次 DOM 变化时立即触发回调，而是把本次 JS 执行期间的
+    //   所有变化批量收集成一个 MutationRecord 数组，
+    //   等 JS 主线程空闲（当前事件循环结束）后，才一次性触发回调。
+    //
+    //   这样设计的好处：
+    //     - 避免"DOM 变化 → 触发回调 → 回调又改 DOM → 再次触发回调"的无限循环
+    //     - 批量处理提升性能，不会阻塞页面渲染
+    //     - 和 IntersectionObserver、ResizeObserver 设计理念一致
+    //
+    // 用法：
+    //   1. 创建 observer 并传入回调函数
+    //   2. 调用 observer.observe(目标元素, 配置)
+    //   3. 不需要时调用 observer.disconnect()（记得清理！否则内存泄漏）
+    // ============================================================
+
+    const observerLog = document.getElementById("observer-log");
+    const observedContainer = document.getElementById("observed-container");
+    let observer = null;
+    let childCount = 0;
+
+    function startObserving() {
+      if (observer) {
+        observerLog.textContent = "已经在监听了";
+        return;
+      }
+
+      // 创建 MutationObserver
+      observer = new MutationObserver((mutations) => {
+        // mutations 是一个 MutationRecord 数组
+        mutations.forEach((mutation) => {
+          let msg = "";
+
+          switch (mutation.type) {
+            case "childList":
+              // 子节点变化
+              if (mutation.addedNodes.length > 0) {
+                msg = "[子节点新增] 添加了 " + mutation.addedNodes.length + " 个节点";
+              }
+              if (mutation.removedNodes.length > 0) {
+                msg = "[子节点删除] 移除了 " + mutation.removedNodes.length + " 个节点";
+              }
+              break;
+
+            case "attributes":
+              // 属性变化
+              msg =
+                "[属性变化] " + mutation.attributeName +
+                ": " + mutation.oldValue +
+                " → " + mutation.target.getAttribute(mutation.attributeName);
+              break;
+
+            case "characterData":
+              // 文本内容变化
+              msg = "[文本变化] " + mutation.oldValue + " → " + mutation.target.textContent;
+              break;
+          }
+
+          if (msg) {
+            const time = new Date().toLocaleTimeString();
+            observerLog.textContent += "\n" + time + " " + msg;
+            // 自动滚动到底部
+            observerLog.scrollTop = observerLog.scrollHeight;
+          }
+        });
+      });
+
+      // 开始监听 — 配置要监听哪些变化
+      observer.observe(observedContainer, {
+        childList: true,         // 监听子节点增删
+        attributes: true,        // 监听属性变化
+        characterData: true,     // 监听文本变化
+        subtree: true,           // 监听所有后代（不只是直接子节点）
+        attributeOldValue: true, // 记录属性旧值
+        characterDataOldValue: true, // 记录文本旧值
+      });
+
+      observerLog.textContent = "✓ 开始监听容器变化...";
+    }
+
+    function stopObserving() {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+        observerLog.textContent += "\n\n✗ 已停止监听";
+      }
+    }
+
+    function addObservedChild() {
+      childCount++;
+      const p = document.createElement("p");
+      p.textContent = "动态添加的子元素 #" + childCount;
+      p.style.color = "#4a90d9";
+      observedContainer.appendChild(p);
+    }
+
+    function removeObservedChild() {
+      const last = observedContainer.querySelector("p:last-child");
+      if (last && last.id !== "observed-text") {
+        last.remove();
+      }
+    }
+
+    function changeObservedAttr() {
+      const current = observedContainer.style.borderColor;
+      const newColor = current === "red" ? "#4a90d9" : "red";
+      observedContainer.setAttribute("style",
+        "border: 2px dashed " + newColor + "; padding: 10px; min-height: 50px;"
+      );
+    }
+
+    function changeObservedText() {
+      const textEl = document.getElementById("observed-text");
+      textEl.firstChild.textContent =
+        "文字已修改 (" + new Date().toLocaleTimeString() + ")";
+    }
+  </script>
+
+  <!-- ==================== 练习挑战 ==================== -->
+  <div style="border: 1px solid #4a90d9; padding: 15px; margin: 15px 0; border-radius: 4px;">
+    <h2>练习挑战</h2>
+    <p style="color: #666;">在看解答之前先自己想一想！</p>
+
+    <!-- 挑战 1 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 1：自己写 DocumentFragment 版本</strong>
+      <p>
+        下方有两个容器。用 <strong>逐个 appendChild</strong> 向左边容器添加 200 个元素，
+        用 <strong>DocumentFragment</strong> 向右边容器添加 200 个元素，对比耗时。
+        先自己写，再点"查看解答"对比思路。
+      </p>
+      <div style="display: flex; gap: 20px; margin: 10px 0;">
+        <div style="flex: 1;">
+          <h3 style="font-size: 14px;">逐个 appendChild</h3>
+          <button onclick="ch1Naive()">运行（慢方式）</button>
+          <div id="ch1-naive-container" style="border: 1px solid #ddd; max-height: 100px; overflow-y: auto; margin-top: 6px;"></div>
+          <div id="ch1-naive-time" style="font-family: monospace; font-size: 13px; color: #e74c3c; margin-top: 4px;"></div>
+        </div>
+        <div style="flex: 1;">
+          <h3 style="font-size: 14px;">DocumentFragment</h3>
+          <button onclick="ch1Fragment()">运行（快方式）</button>
+          <div id="ch1-frag-container" style="border: 1px solid #ddd; max-height: 100px; overflow-y: auto; margin-top: 6px;"></div>
+          <div id="ch1-frag-time" style="font-family: monospace; font-size: 13px; color: #27ae60; margin-top: 4px;"></div>
+        </div>
+      </div>
+      <button onclick="ch1ShowSolution()">查看解答</button>
+      <pre id="ch1-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+
+    <!-- 挑战 2 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 2：用 MutationObserver 实现实时字数计数器</strong>
+      <p>
+        在下方 <code>contenteditable</code> 区域输入内容，
+        用 MutationObserver 监听文本变化并实时显示字数。
+        （提示：监听 <code>characterData</code> + <code>childList</code>，<code>subtree: true</code>）
+      </p>
+      <div id="ch2-editor" contenteditable="true"
+        style="border: 1px solid #ccc; padding: 10px; min-height: 60px; border-radius: 4px; outline: none; font-size: 15px;">
+        在这里输入内容...
+      </div>
+      <div style="font-family: monospace; margin: 8px 0; color: #555;">
+        字数：<span id="ch2-count">0</span>
+      </div>
+      <button onclick="ch2Activate()">激活计数器（查看解答）</button>
+      <pre id="ch2-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 练习挑战的实现 ====================
+
+    // 挑战 1：Fragment vs 逐个 appendChild
+    function ch1Naive() {
+      const container = document.getElementById("ch1-naive-container");
+      container.innerHTML = "";
+      const start = performance.now();
+
+      for (let i = 0; i < 200; i++) {
+        const div = document.createElement("div");
+        div.textContent = "item " + i;
+        div.style.padding = "1px 4px";
+        container.appendChild(div); // 每次都触发重绘
+      }
+
+      const ms = (performance.now() - start).toFixed(2);
+      document.getElementById("ch1-naive-time").textContent = `耗时: ${ms} ms`;
+    }
+
+    function ch1Fragment() {
+      const container = document.getElementById("ch1-frag-container");
+      container.innerHTML = "";
+      const start = performance.now();
+
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < 200; i++) {
+        const div = document.createElement("div");
+        div.textContent = "item " + i;
+        div.style.padding = "1px 4px";
+        fragment.appendChild(div); // 只在内存中操作，无重绘
+      }
+      container.appendChild(fragment); // 只触发一次重绘
+
+      const ms = (performance.now() - start).toFixed(2);
+      document.getElementById("ch1-frag-time").textContent = `耗时: ${ms} ms`;
+    }
+
+    function ch1ShowSolution() {
+      const ans = document.getElementById("ch1-answer");
+      ans.textContent =
+`// 解答：DocumentFragment 版本
+function addWithFragment(container, count) {
+  const fragment = document.createDocumentFragment();
+
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement("div");
+    div.textContent = "item " + i;
+    fragment.appendChild(div); // 操作在内存中进行，不触发重绘
+  }
+
+  container.appendChild(fragment); // 一次性把所有元素插入 DOM，只触发 1 次重绘
+}
+
+// 关键点：
+// - createDocumentFragment() 创建一个游离于 DOM 之外的虚拟容器
+// - 向 fragment 添加元素时，浏览器不会重新计算布局（无 reflow）
+// - 最后 appendChild(fragment) 时，fragment 的所有子元素被移入真实 DOM
+//   fragment 自身消失（它只是一个临时容器）`;
+      ans.style.display = "block";
+    }
+
+    // 挑战 2：MutationObserver 字数计数器
+    function ch2Activate() {
+      const ans = document.getElementById("ch2-answer");
+      ans.textContent =
+`// 解答：用 MutationObserver 监听 contenteditable 的文本变化
+const editor = document.getElementById("ch2-editor");
+const countEl = document.getElementById("ch2-count");
+
+function updateCount() {
+  // textContent 获取所有文本，trim 去掉首尾空白
+  const text = editor.textContent.trim();
+  countEl.textContent = text.length;
+}
+
+const observer = new MutationObserver(updateCount);
+observer.observe(editor, {
+  characterData: true, // 监听文本节点的内容变化
+  childList: true,     // 监听子节点增删（粘贴、换行时新增节点）
+  subtree: true,       // 监听所有后代节点（contenteditable 内部可能有多层）
+});
+
+// 立即计算一次初始字数
+updateCount();`;
+      ans.style.display = "block";
+
+      // 激活计数器
+      const editor = document.getElementById("ch2-editor");
+      const countEl = document.getElementById("ch2-count");
+
+      function updateCount() {
+        const text = editor.textContent.trim();
+        countEl.textContent = text.length;
+      }
+
+      const charObserver = new MutationObserver(updateCount);
+      charObserver.observe(editor, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+
+      updateCount();
+    }
+  </script>
+
+</body>
+</html>

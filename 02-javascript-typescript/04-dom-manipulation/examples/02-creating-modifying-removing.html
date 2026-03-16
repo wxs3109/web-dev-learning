@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>02 — 创建、修改、删除元素 (Create, Modify, Remove)</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+    .box { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .result { background: #f0f0f0; padding: 10px; margin: 10px 0; white-space: pre-wrap; font-family: monospace; }
+    button { padding: 6px 14px; margin: 4px; cursor: pointer; border: 1px solid #999; border-radius: 3px; background: #fff; }
+    button:hover { background: #eee; }
+    .card { border: 1px solid #4a90d9; padding: 10px; margin: 8px 0; border-radius: 4px; background: #f0f7ff; }
+    .danger { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+    02 — 创建、修改、删除元素 (Create, Modify, Remove)
+
+    在浏览器中打开此文件，点击按钮查看效果。
+    打开 DevTools Console (F12) 查看日志。
+
+    本文件涵盖：
+      1. textContent vs innerHTML
+      2. createElement + appendChild（创建元素）
+      3. 修改元素内容和样式
+      4. 删除元素
+      5. 插入位置控制（prepend, insertBefore）
+      6. insertAdjacentHTML / insertAdjacentElement
+      7. 练习挑战
+  ============================================================ -->
+
+  <h1>DOM 创建、修改、删除元素</h1>
+
+  <!-- PART 1: textContent vs innerHTML -->
+  <div class="box">
+    <h2>PART 1: textContent vs innerHTML</h2>
+    <div id="text-demo">这是原始内容</div>
+    <button onclick="demoTextContent()">textContent 设置</button> 
+    <button onclick="demoInnerHTML()">innerHTML 设置</button>
+    <button onclick="resetPart1()">重置</button>
+    <div class="result" id="part1-log"></div>
+  </div>
+
+  <!-- PART 2: 创建元素 -->
+  <div class="box">
+    <h2>PART 2: createElement + appendChild</h2>
+    <ul id="todo-list">
+      <li>学习 HTML</li>
+      <li>学习 CSS</li>
+    </ul>
+    <button onclick="addTodo()">添加待办项</button>
+    <button onclick="addCard()">添加卡片</button>
+    <div id="card-container"></div>
+  </div>
+
+  <!-- PART 3: 修改元素 -->
+  <div class="box">
+    <h2>PART 3: 修改元素内容和样式</h2>
+    <p id="modify-target">这段文字会被修改</p>
+    <button onclick="modifyText()">修改文字</button>
+    <button onclick="modifyStyle()">修改样式</button>
+    <button onclick="modifyMultiple()">批量修改</button>
+    <button onclick="resetPart3()">重置</button>
+  </div>
+
+  <!-- PART 4: 删除元素 -->
+  <div class="box">
+    <h2>PART 4: 删除元素</h2>
+    <ul id="remove-list">
+      <li>项目 A</li>
+      <li>项目 B</li>
+      <li>项目 C</li>
+      <li>项目 D</li>
+      <li>项目 E</li>
+    </ul>
+    <button onclick="removeFirst()">删除第一个</button>
+    <button onclick="removeLast()">删除最后一个</button>
+    <button onclick="clearAll()">清空全部</button>
+  </div>
+
+  <!-- PART 5: 插入位置 -->
+  <div class="box">
+    <h2>PART 5: 插入位置控制</h2>
+    <ul id="insert-list">
+      <li>中间项</li>
+    </ul>
+    <button onclick="insertAtBegin()">插入到最前面</button>
+    <button onclick="insertAtEnd()">插入到最后面</button>
+    <button onclick="insertBefore2()">插入到"中间项"前面</button>
+  </div>
+
+  <!-- PART 6: insertAdjacentHTML / insertAdjacentElement -->
+  <div class="box">
+    <h2>PART 6: insertAdjacentHTML / insertAdjacentElement</h2>
+    <p>
+      比 <code>insertBefore</code> 更直观的插入方式：用位置关键字描述目标位置，
+      不需要获取父元素的引用，代码意图更清晰。
+    </p>
+    <div id="adjacent-wrapper">
+      <div id="adjacent-target" style="border: 2px solid #4a90d9; padding: 12px; margin: 10px 0; border-radius: 4px; background: #f0f7ff; text-align: center;">
+        目标元素（中间）— 四个按钮会在它的不同位置插入内容
+      </div>
+    </div>
+    <button onclick="adjBeforeBegin()">beforebegin（元素前）</button>
+    <button onclick="adjAfterBegin()">afterbegin（内部最前）</button>
+    <button onclick="adjBeforeEnd()">beforeend（内部最后）</button>
+    <button onclick="adjAfterEnd()">afterend（元素后）</button>
+    <button onclick="adjReset()">重置</button>
+    <div class="result" id="adj-log"></div>
+  </div>
+
+  <!-- 练习挑战 -->
+  <div class="box" style="border-color: #4a90d9;">
+    <h2>练习挑战</h2>
+    <p style="color: #666;">在看解答之前先自己想一想！</p>
+
+    <!-- 挑战 1 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 1：用 createElement + appendChild 创建列表</strong>
+      <p>用 <code>document.createElement</code> 和 <code>appendChild</code>，<strong>不用 innerHTML</strong>，
+      在下方空列表中添加三个 <code>&lt;li&gt;</code>：苹果、香蕉、草莓。</p>
+      <ul id="ch1-list" style="min-height: 40px; border: 1px solid #ddd; padding: 10px; border-radius: 3px;"></ul>
+      <button onclick="ch1ShowSolution()">查看解答并运行</button>
+      <pre id="ch1-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+
+    <!-- 挑战 2 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 2：用 insertAdjacentHTML 在元素前后插入内容</strong>
+      <p>用 <code>insertAdjacentHTML</code> 在下方 <code>&lt;p&gt;</code> 前面插入
+      <code>&lt;strong&gt;警告：&lt;/strong&gt;</code>，后面插入 <code>&lt;small&gt;（注意 XSS 风险）&lt;/small&gt;</code>。</p>
+      <div id="ch2-container" style="border: 1px solid #ddd; padding: 10px; border-radius: 3px;">
+        <p id="ch2-target" style="margin: 0;">这是目标段落</p>
+      </div>
+      <button onclick="ch2ShowSolution()" style="margin-top: 8px;">查看解答并运行</button>
+      <pre id="ch2-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+
+    <!-- 挑战 3 -->
+    <div style="background: #f8f9fa; border: 1px dashed #aaa; padding: 12px; margin: 12px 0; border-radius: 4px;">
+      <strong>挑战 3：删除带特定 data 属性的元素</strong>
+      <p>点击"运行"，删除下方列表中所有 <code>data-invalid="true"</code> 的项目，保留其他项目。</p>
+      <ul id="ch3-list" style="border: 1px solid #ddd; padding: 10px; border-radius: 3px;">
+        <li data-invalid="false">✓ 正常项目 A</li>
+        <li data-invalid="true" style="color: #e74c3c;">✗ 无效项目 B</li>
+        <li data-invalid="false">✓ 正常项目 C</li>
+        <li data-invalid="true" style="color: #e74c3c;">✗ 无效项目 D</li>
+        <li data-invalid="false">✓ 正常项目 E</li>
+      </ul>
+      <button onclick="ch3ShowSolution()">查看解答并运行</button>
+      <pre id="ch3-answer" style="display:none; background: #e8f4e8; border: 1px solid #a5d6a7; padding: 10px; border-radius: 4px; font-size: 13px; margin-top: 8px;"></pre>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // PART 1 — textContent vs innerHTML
+    //
+    // textContent: 设置纯文本，HTML 标签会被当作文字显示
+    // innerHTML:   设置 HTML，标签会被解析渲染
+    //
+    // 安全提示：innerHTML 有 XSS 风险，不要用它插入用户输入的内容！
+    // ============================================================
+
+    const part1Log = document.getElementById("part1-log");
+
+    function demoTextContent() {
+      const el = document.getElementById("text-demo");
+
+      // textContent — HTML 标签会被当作纯文本显示
+      el.textContent = "这是 <strong>粗体</strong> 文字吗？不是！标签被当文字了";
+
+      part1Log.textContent =
+        "textContent 设置了带 HTML 标签的文字\n" +
+        "→ 标签被原样显示，不会被解析\n" +
+        "→ 更安全，防止 XSS 攻击";
+    }
+
+    function demoInnerHTML() {
+      const el = document.getElementById("text-demo");
+
+      // innerHTML — HTML 标签会被解析渲染
+      el.innerHTML = '这是 <strong>粗体</strong> 和 <span style="color:red">红色</span> 文字';
+
+      part1Log.textContent =
+        "innerHTML 设置了带 HTML 标签的文字\n" +
+        "→ 标签被解析渲染了\n" +
+        "→ 注意: 不要用 innerHTML 插入用户输入，有 XSS 风险！";
+    }
+
+    function resetPart1() {
+      document.getElementById("text-demo").textContent = "这是原始内容";
+      part1Log.textContent = "";
+    }
+
+
+    // ============================================================
+    // PART 2 — createElement + appendChild
+    //
+    // 创建元素的标准流程：
+    //   1. document.createElement("标签名") — 创建元素
+    //   2. 设置属性、内容、样式
+    //   3. parentElement.appendChild(新元素) — 添加到 DOM 中
+    // ============================================================
+
+    let todoCount = 3;
+
+    function addTodo() {
+      // 1. 创建元素
+      const li = document.createElement("li");
+
+      // 2. 设置内容
+      li.textContent = "学习 JavaScript 第 " + todoCount + " 课";
+      todoCount++;
+
+      // 3. 添加到列表中
+      const list = document.getElementById("todo-list");
+      list.appendChild(li);
+
+      console.log("添加了新的 li 元素:", li.textContent);
+    }
+
+    function addCard() {
+      // 创建一个更复杂的元素结构
+      const card = document.createElement("div");
+      card.className = "card"; // 设置 class
+
+      const title = document.createElement("h3");
+      title.textContent = "卡片标题 #" + (document.querySelectorAll(".card").length + 1);
+
+      const text = document.createElement("p");
+      text.textContent = "这是一个动态创建的卡片，包含多个子元素。";
+
+      const btn = document.createElement("button");
+      btn.textContent = "删除此卡片";
+      btn.onclick = function () {
+        card.remove(); // 删除自己
+      };
+
+      // 组装：先添加子元素到 card，再把 card 添加到页面
+      card.appendChild(title);
+      card.appendChild(text);
+      card.appendChild(btn);
+
+      document.getElementById("card-container").appendChild(card);
+    }
+
+
+    // ============================================================
+    // PART 3 — 修改元素内容和样式
+    //
+    // 修改文字: el.textContent = "..."
+    // 修改样式: el.style.属性 = "值"（驼峰命名）
+    // ============================================================
+
+    function modifyText() {
+      const el = document.getElementById("modify-target");
+      el.textContent = "文字已经被修改了！（时间: " + new Date().toLocaleTimeString() + "）";
+    }
+
+    function modifyStyle() {
+      const el = document.getElementById("modify-target");
+
+      // style 属性使用驼峰命名（CSS 的 background-color → backgroundColor）
+      el.style.color = "white";
+      el.style.backgroundColor = "#4a90d9";
+      el.style.padding = "10px";
+      el.style.borderRadius = "4px";
+      el.style.fontSize = "18px";
+
+      console.log("修改了样式，CSS 属性名转驼峰:");
+      console.log("  background-color → backgroundColor");
+      console.log("  border-radius → borderRadius");
+      console.log("  font-size → fontSize");
+    }
+
+    function modifyMultiple() {
+      const el = document.getElementById("modify-target");
+
+      // 用 Object.assign 批量设置样式
+      Object.assign(el.style, {
+        color: "#333",
+        backgroundColor: "#ffffcc",
+        padding: "15px",
+        border: "2px dashed orange",
+        fontSize: "16px",
+        borderRadius: "8px",
+      });
+
+      el.textContent = "批量修改了样式（用 Object.assign）";
+    }
+
+    function resetPart3() {
+      const el = document.getElementById("modify-target");
+      el.textContent = "这段文字会被修改";
+      el.style.cssText = ""; // 清除所有内联样式
+    }
+
+
+    // ============================================================
+    // PART 4 — 删除元素
+    //
+    // 现代方法: element.remove()
+    // 旧方法:   parent.removeChild(child)
+    // ============================================================
+
+    function removeFirst() {
+      const list = document.getElementById("remove-list");
+      const first = list.querySelector("li");
+      if (first) {
+        first.remove(); // 现代写法，简洁
+        console.log("删除了:", first.textContent);
+      } else {
+        console.log("列表已空");
+      }
+    }
+
+    function removeLast() {
+      const list = document.getElementById("remove-list");
+      const last = list.querySelector("li:last-child");
+      if (last) {
+        // 旧写法（了解即可）：通过父元素删除子元素
+        list.removeChild(last);
+        console.log("删除了:", last.textContent);
+      } else {
+        console.log("列表已空");
+      }
+    }
+
+    function clearAll() {
+      const list = document.getElementById("remove-list");
+
+      // 方式1: innerHTML 清空（简单粗暴）
+      list.innerHTML = "";
+
+      // 方式2: 循环删除（更精确控制）
+      // while (list.firstChild) {
+      //   list.removeChild(list.firstChild);
+      // }
+
+      console.log("列表已清空");
+    }
+
+
+    // ============================================================
+    // PART 5 — 插入位置控制
+    //
+    // appendChild      — 添加到末尾
+    // prepend          — 添加到开头（现代 API）
+    // insertBefore     — 插入到某个元素前面（需要父元素引用）
+    // after / before   — 在元素后面/前面插入（现代 API，接受多个节点）
+    //
+    // 上述方法需要先用 createElement 创建好节点。
+    // PART 6 的 insertAdjacentHTML 可以直接插入 HTML 字符串，更简洁。
+    //
+    // clearAll 补充说明 — innerHTML = "" 的局限：
+    //   如果子元素上有事件监听器，但 JS 代码还持有对子元素的引用，
+    //   那么强制用 innerHTML 清空 DOM 后，这些引用会阻止 GC 释放内存（内存泄漏）。
+    //   循环方式 while (list.firstChild) { list.removeChild(list.firstChild) }
+    //   给 GC 更多机会逐步回收内存。实践中大多数情况用 innerHTML = "" 够用。
+    // ============================================================
+
+    let insertCount = 0;
+
+    function insertAtBegin() {
+      const list = document.getElementById("insert-list");
+      const li = document.createElement("li");
+      li.textContent = "前面插入 #" + ++insertCount;
+      li.style.color = "blue";
+
+      // prepend — 添加到最前面
+      list.prepend(li);
+    }
+
+    function insertAtEnd() {
+      const list = document.getElementById("insert-list");
+      const li = document.createElement("li");
+      li.textContent = "后面插入 #" + ++insertCount;
+      li.style.color = "green";
+
+      // appendChild — 添加到最后面
+      list.appendChild(li);
+    }
+
+    function insertBefore2() {
+      const list = document.getElementById("insert-list");
+      const li = document.createElement("li");
+      li.textContent = "中间前插入 #" + ++insertCount;
+      li.style.color = "red";
+
+      // insertBefore(新元素, 参考元素)
+      // 找到"中间项"
+      const middle = [...list.children].find(
+        (el) => el.textContent === "中间项"
+      );
+      if (middle) {
+        list.insertBefore(li, middle);
+      }
+    }
+
+
+    // ============================================================
+    // PART 6 — insertAdjacentHTML / insertAdjacentElement
+    //
+    // 四个位置关键字（相对于调用方法的目标元素）：
+    //
+    //   "beforebegin" — 目标元素的开标签之前（插入后成为目标的前一个兄弟）
+    //   "afterbegin"  — 目标元素开标签之后，第一个子节点之前（插在内部最前面）
+    //   "beforeend"   — 目标元素闭标签之前，最后一个子节点之后（插在内部最后面）
+    //   "afterend"    — 目标元素的闭标签之后（插入后成为目标的下一个兄弟）
+    //
+    // 可视化（target 是目标元素）：
+    //
+    //   <!-- beforebegin -->
+    //   <div id="target">
+    //     <!-- afterbegin -->
+    //     <p>原有内容</p>
+    //     <!-- beforeend -->
+    //   </div>
+    //   <!-- afterend -->
+    //
+    // 为什么用它？
+    //   - 不需要获取父元素：target.insertAdjacentHTML("beforebegin", html)
+    //     比 target.parentNode.insertBefore(el, target) 更简洁
+    //   - 位置关键字让代码意图更直观，一眼就能看出插在哪里
+    //   - insertAdjacentHTML 接受 HTML 字符串；insertAdjacentElement 接受已有元素节点
+    //
+    // 注意：insertAdjacentHTML 也有 XSS 风险，不要传入用户输入的内容！
+    // ============================================================
+
+    const adjLog = document.getElementById("adj-log");
+    let adjCount = 0;
+
+    function adjBeforeBegin() {
+      const target = document.getElementById("adjacent-target");
+      adjCount++;
+      // 在目标元素自身的开标签之前插入（目标的前一兄弟）
+      target.insertAdjacentHTML(
+        "beforebegin",
+        `<div style="background:#ffe0b2;padding:6px;margin:3px 0;border-radius:3px;">
+          ↑ beforebegin #${adjCount}（目标的前一个兄弟）
+        </div>`
+      );
+      adjLog.textContent = `insertAdjacentHTML("beforebegin", ...) — 插入到目标元素自身之前`;
+    }
+
+    function adjAfterBegin() {
+      const target = document.getElementById("adjacent-target");
+      adjCount++;
+      // 在目标元素内部的最开头插入（第一个子节点之前）
+      target.insertAdjacentHTML(
+        "afterbegin",
+        `<div style="background:#c8e6c9;padding:4px;margin:3px 0;border-radius:3px;font-size:13px;">
+          afterbegin #${adjCount}（内部最前）
+        </div>`
+      );
+      adjLog.textContent = `insertAdjacentHTML("afterbegin", ...) — 插入到目标元素内部最前面`;
+    }
+
+    function adjBeforeEnd() {
+      const target = document.getElementById("adjacent-target");
+      adjCount++;
+      // 在目标元素内部的最末尾插入（最后一个子节点之后）
+      target.insertAdjacentHTML(
+        "beforeend",
+        `<div style="background:#b3e5fc;padding:4px;margin:3px 0;border-radius:3px;font-size:13px;">
+          beforeend #${adjCount}（内部最后）
+        </div>`
+      );
+      adjLog.textContent = `insertAdjacentHTML("beforeend", ...) — 插入到目标元素内部最后面`;
+    }
+
+    function adjAfterEnd() {
+      const target = document.getElementById("adjacent-target");
+      adjCount++;
+      // 在目标元素自身的闭标签之后插入（目标的后一兄弟）
+      target.insertAdjacentHTML(
+        "afterend",
+        `<div style="background:#f8bbd0;padding:6px;margin:3px 0;border-radius:3px;">
+          ↓ afterend #${adjCount}（目标的后一个兄弟）
+        </div>`
+      );
+      adjLog.textContent = `insertAdjacentHTML("afterend", ...) — 插入到目标元素自身之后`;
+    }
+
+    function adjReset() {
+      const wrapper = document.getElementById("adjacent-wrapper");
+      wrapper.innerHTML = `
+        <div id="adjacent-target" style="border: 2px solid #4a90d9; padding: 12px; margin: 10px 0; border-radius: 4px; background: #f0f7ff; text-align: center;">
+          目标元素（中间）— 四个按钮会在它的不同位置插入内容
+        </div>
+      `;
+      adjCount = 0;
+      adjLog.textContent = "已重置";
+    }
+
+
+    // ============================================================
+    // 练习挑战解答
+    // ============================================================
+
+    function ch1ShowSolution() {
+      const answerEl = document.getElementById("ch1-answer");
+      answerEl.textContent =
+`// 解答：用 createElement + appendChild 创建列表项
+const list = document.getElementById("ch1-list");
+const fruits = ["苹果", "香蕉", "草莓"];
+
+fruits.forEach(function(name) {
+  const li = document.createElement("li");
+  li.textContent = name;
+  list.appendChild(li);
+});`;
+      answerEl.style.display = "block";
+
+      // 运行解答
+      const list = document.getElementById("ch1-list");
+      ["苹果", "香蕉", "草莓"].forEach(function (name) {
+        const li = document.createElement("li");
+        li.textContent = name;
+        list.appendChild(li);
+      });
+    }
+
+    function ch2ShowSolution() {
+      const answerEl = document.getElementById("ch2-answer");
+      answerEl.textContent =
+`// 解答：用 insertAdjacentHTML 在目标元素前后插入内容
+const target = document.getElementById("ch2-target");
+
+// "beforebegin" — 在 <p> 标签之前，成为 <p> 的前一兄弟
+target.insertAdjacentHTML("beforebegin", "<strong>警告：</strong>");
+
+// "afterend" — 在 </p> 标签之后，成为 <p> 的后一兄弟
+target.insertAdjacentHTML("afterend", "<small>（注意 XSS 风险）</small>");`;
+      answerEl.style.display = "block";
+
+      // 运行解答
+      const target = document.getElementById("ch2-target");
+      target.insertAdjacentHTML("beforebegin", "<strong>警告：</strong>");
+      target.insertAdjacentHTML("afterend", "<small>（注意 XSS 风险）</small>");
+    }
+
+    function ch3ShowSolution() {
+      const answerEl = document.getElementById("ch3-answer");
+      answerEl.textContent =
+`// 解答：用属性选择器选中所有 data-invalid="true" 的元素，逐个删除
+const invalidItems = document.querySelectorAll('#ch3-list [data-invalid="true"]');
+invalidItems.forEach(function(item) {
+  item.remove();
+});
+
+// 注意：不能在 forEach 中直接修改正在遍历的 NodeList，
+// 但这里 querySelectorAll 返回的是静态快照，所以 forEach + remove 是安全的。`;
+      answerEl.style.display = "block";
+
+      // 运行解答
+      const invalidItems = document.querySelectorAll('#ch3-list [data-invalid="true"]');
+      invalidItems.forEach(function (item) {
+        item.remove();
+      });
+    }
+
+</body>
+</html>
