@@ -45,9 +45,17 @@ console.log("正常调用:", greet("Bob"));
 
 // 多个参数
 function add(a, b) {
-  return a + b;
+  return
+  a + b;
 }
 console.log("add(3, 5) =", add(3, 5));   // 8
+
+function fibonacci(n) {
+  if (n <= 0) return 0;
+  if (n === 1) return 1;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+console.log("fibonacci(10) =", fibonacci(10)); // 55
 
 // 参数个数不匹配时：
 // 多传的参数会被忽略，少传的参数值为 undefined

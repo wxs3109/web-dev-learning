@@ -60,6 +60,7 @@ console.log("\n========== PART 2: 三元运算符 ==========\n");
 const age = 20;
 const status = age >= 18 ? "成年人" : "未成年人";
 console.log(`${age} 岁 → ${status}`);    // "20 岁 → 成年人"
+console.log(`${age} 岁 → ${age >= 18 ? "成年人" : "未成年人"}`); // 直接在模板字符串里使用
 
 // 也可以嵌套，但不推荐（可读性差）
 const score = 85;

@@ -114,11 +114,12 @@ console.log("长方形:", createRect(5, 10));   // { width: 5, height: 10, area:
 console.log("\n========== PART 3: 剩余参数 ==========\n");
 
 // 基本用法：收集所有参数
-function sumAll(...numbers) {
-  // numbers 是一个真正的数组，可以直接用数组方法
-  return numbers.reduce((total, n) => total + n, 0);
+function multiply(...numbers) {
+  return numbers.reduce((product, n) => product * n, 1);
 }
-console.log("sumAll(1,2,3,4) =", sumAll(1, 2, 3, 4)); // 10
+console.log("multiply(2, 3) =", multiply(2, 3));           // 6
+console.log("multiply(2, 3, 4) =", multiply(2, 3, 4));     // 24
+console.log("multiply() =", multiply());                     // 1 (空数组的积定义为 1)
 
 // 与普通参数搭配使用：前面的参数先匹配，剩余的归 rest
 function logWithLevel(level, ...messages) {
@@ -267,3 +268,23 @@ console.log("  - 需要收集可变数量的参数 → 用 rest 参数 (...args)
 console.log("  - 把数组展开为参数 → 用 spread 语法 (...arr)");
 console.log("  - 给参数设默认值 → 用默认参数语法（= defaultValue）");
 console.log("  - 避免使用 arguments 对象 → 用 rest 参数代替\n");
+
+
+// give me an example using function as parameters and arguments
+
+console.log("\n========== PART 7: 函数作为参数 ==========\n");
+
+// 函数作为参数（回调函数）
+function greet(name, formatter) {
+  const message = formatter(name);
+  console.log(message);
+}
+
+// 定义一个格式化函数
+function fancyFormatter(name) {
+  return `✨✨ ${name.toUpperCase()} ✨✨`;
+}
+
+// 调用 greet，传入 fancyFormatter 作为回调
+greet("Alice", fancyFormatter);
+// 输出: ✨✨ ALICE ✨✨
